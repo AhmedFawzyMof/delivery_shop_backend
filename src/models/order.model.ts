@@ -99,6 +99,7 @@ export class OrderModel {
       .leftJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
       .leftJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
       .where(and(...conditions))
+      .orderBy(order.order_id)
       .limit(limit)
       .offset(offset);
 
