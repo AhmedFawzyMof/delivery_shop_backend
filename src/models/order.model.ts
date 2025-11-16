@@ -71,7 +71,7 @@ export class OrderModel {
       .get();
 
     const result = await db
-      .select({
+      .selectDistinct({
         order_id: order.order_id,
         user_id: order.user_id,
         restaurant_id: order.restaurant_id,
@@ -99,9 +99,9 @@ export class OrderModel {
       .leftJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
       .leftJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
       .where(and(...conditions))
-      .orderBy(order.order_id)
       .limit(limit)
-      .offset(offset);
+      .offset(offset)
+      .orderBy(desc(order.created_at));
 
     return {
       orderCount: orderCount?.order_count,
@@ -124,7 +124,7 @@ export class OrderModel {
     const limit = page * 50;
 
     return await db
-      .select({
+      .selectDistinct({
         order_id: order.order_id,
         user_id: order.user_id,
         restaurant_id: order.restaurant_id,
@@ -378,8 +378,7 @@ export class OrderModel {
       .innerJoin(restaurant, eq(order.restaurant_id, user.restaurant_id))
       .where(
         and(not(eq(order.order_status, "delivered")), eq(order.driver_id, id))
-      )
-      .orderBy(desc(order.created_at));
+      );
   }
 
   static async getByDriverId(
