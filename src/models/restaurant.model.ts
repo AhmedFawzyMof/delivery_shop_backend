@@ -61,6 +61,7 @@ export class RestaurantModel {
       .from(restaurant)
       .leftJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
       .where(and(...conditions, eq(cities.branch_id, branch_id)))
+      .groupBy(restaurant.restaurant_id)
       .limit(limit)
       .offset(offset);
 
