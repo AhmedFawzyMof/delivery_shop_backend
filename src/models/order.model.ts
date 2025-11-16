@@ -412,7 +412,7 @@ export class OrderModel {
       )
       .get();
     const orders = await db
-      .select({
+      .selectDistinct({
         order_id: order.order_id,
         order_total_price: order.order_total_price,
         order_delivery_cost: order.order_delivery_cost,
