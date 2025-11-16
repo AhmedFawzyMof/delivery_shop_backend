@@ -145,7 +145,7 @@ export class AdminModel {
       .get();
 
     if (!foundAdmin?.admin_id) {
-      return { error: "Admin not found" };
+      throw new Error("Admin not found");
     }
 
     const adminRecord = foundAdmin;

@@ -87,6 +87,7 @@ export class DriverModel {
       .innerJoin(cities, eq(driver.driver_city, cities.city_name))
       .leftJoin(restaurant, eq(driver.stationed_at, restaurant.restaurant_id))
       .where(and(...conditions))
+      .groupBy(driver.driver_id)
       .limit(limit)
       .offset(offset)
       .all();

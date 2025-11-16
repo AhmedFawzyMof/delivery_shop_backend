@@ -120,17 +120,9 @@ const getDriverById = async (req: Request, res: Response) => {
 
 const addDriver = async (req: Request, res: Response) => {
   try {
-    const {
-      full_name,
-      phone,
-      city,
-      type,
-      id_number,
-      plate_number,
-      license_photo,
-    } = req.body;
+    const { full_name, phone, city, type, id_number, plate_number } = req.body;
 
-    const { data: driver, error } = await tryCatch(
+    const { data: _, error } = await tryCatch(
       DriverModel.create({
         driver_full_name: full_name,
         driver_phone: phone,
@@ -142,34 +134,11 @@ const addDriver = async (req: Request, res: Response) => {
     );
 
     if (error) {
-      return res.status(400).json({ message: error.message });
+      console.log(error);
+      return res.status(500).json({ message: error.message });
     }
 
-    let imageUrl = "";
-
-    if (license_photo) {
-      const finalDir = `public/images/drivers/license/${driver[0].driver_id}`;
-      if (!fs.existsSync(finalDir)) {
-        fs.mkdirSync(finalDir, { recursive: true });
-      }
-
-      const base64Data = license_photo.replace(/^data:image\/\w+;base64,/, "");
-      const buffer = Buffer.from(base64Data, "base64");
-
-      const tempFilePath = path.join(finalDir, `temp-${Date.now()}.png`);
-      fs.writeFileSync(tempFilePath, buffer);
-
-      const webpFileName = await convertToWebp(tempFilePath, finalDir);
-      imageUrl = `/images/drivers/license/${webpFileName}`;
-    }
-
-    // if (driver) {
-    //   await DriverModel.update(driver[0].driver_id, {
-    //     license_photo: imageUrl,
-    //   });
-    // }
-
-    res.json({ success: true, imageUrl });
+    res.json({ success: true });
   } catch (err: any) {
     console.error("addDriver error:", err);
     res
@@ -265,10 +234,10 @@ const editDriver = async (req: Request, res: Response) => {
 
     if (error) {
       console.log(error);
-      res.status(500).json({ message: "خطأ أثناء حظر السائق" });
+      return res.status(500).json({ message: "خطأ أثناء حظر السائق" });
     }
 
-    res.json({ success: true });
+    return res.json({ success: true });
   }
 
   const allowedTextFields = [
@@ -280,6 +249,7 @@ const editDriver = async (req: Request, res: Response) => {
     "driver_city",
     "id_number",
     "plate_number",
+    "password",
     "is_baned",
   ];
 
@@ -287,7 +257,16 @@ const editDriver = async (req: Request, res: Response) => {
 
   for (const field of allowedTextFields) {
     if (field in req.body) {
-      textUpdates[field] = req.body[field];
+      if (field === "password") {
+        const hashedPassword = crypto
+          .createHash("sha256")
+          .update(req.body.password)
+          .digest("hex");
+
+        Object.assign(textUpdates, { password: hashedPassword });
+      } else {
+        textUpdates[field] = req.body[field];
+      }
     }
   }
 
@@ -329,7 +308,6 @@ const editDriver = async (req: Request, res: Response) => {
   }
 
   const allUpdates = { ...textUpdates, ...fileUpdates };
-  console.log(allUpdates);
 
   if (Object.keys(allUpdates).length > 0) {
     const { error } = await tryCatch(DriverModel.update(id, allUpdates));
