@@ -355,6 +355,14 @@ export class OrderModel {
   }
 
   static async activeOrders(id: number) {
+    const sub = db
+      .selectDistinct({ order_id: order.order_id })
+      .from(order)
+      .where(
+        and(not(eq(order.order_status, "delivered")), eq(order.driver_id, id))
+      )
+      .as("sub");
+
     return db
       .select({
         order_id: order.order_id,
@@ -374,11 +382,9 @@ export class OrderModel {
         },
       })
       .from(order)
+      .innerJoin(sub, eq(sub.order_id, order.order_id))
       .innerJoin(user, eq(order.user_id, user.user_id))
-      .innerJoin(restaurant, eq(order.restaurant_id, user.restaurant_id))
-      .where(
-        and(not(eq(order.order_status, "delivered")), eq(order.driver_id, id))
-      );
+      .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id));
   }
 
   static async getByDriverId(
