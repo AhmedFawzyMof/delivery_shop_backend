@@ -378,7 +378,8 @@ export class OrderModel {
       .innerJoin(restaurant, eq(order.restaurant_id, user.restaurant_id))
       .where(
         and(not(eq(order.order_status, "delivered")), eq(order.driver_id, id))
-      );
+      )
+      .orderBy(desc(order.created_at));
   }
 
   static async getByDriverId(
