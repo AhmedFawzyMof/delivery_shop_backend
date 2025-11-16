@@ -24,13 +24,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://delivery-shop-frontend.vercel.app",
-    ],
-    credentials: true,
+    origin: "*",
     optionsSuccessStatus: 200,
   })
 );
@@ -58,7 +52,7 @@ app.use((req, res, next) => {
   }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 });
