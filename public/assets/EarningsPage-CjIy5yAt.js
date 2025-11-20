@@ -1,1 +1,629 @@
-import{d as q,f as d,D as A,h as O,B as R,e as i,a as s,b as t,w as o,u as l,A as B,z as G,o as u,k as c,t as n,x as H,U as J,F as U,l as N,c as $,q as x,n as K,p as Q,C}from"./index-CTakD6A6.js";import{_ as g,a as y,b,c as w}from"./CardTitle.vue_vue_type_script_setup_true_lang-DXNmbM2X.js";import{_ as T}from"./CardDescription.vue_vue_type_script_setup_true_lang-CqkYoIfs.js";import{_ as W}from"./createLucideIcon-Dne6exBT.js";import{_ as z}from"./Input.vue_vue_type_script_setup_true_lang-DPaSW7O1.js";import{_ as X}from"./index-DaZ9IdLv.js";import{_ as Y}from"./CustomPagination.vue_vue_type_script_setup_true_lang-BHUexTDH.js";import{_ as Z}from"./Sidebar.vue_vue_type_script_setup_true_lang-D7ms-d9E.js";import{L as E}from"./loader-circle-_XBcZ5kY.js";import{C as h}from"./clock-CCw5LDAO.js";import{C as ee}from"./circle-check-big-rjFRL17W.js";import{T as te,P as se}from"./truck-C0S8qbak.js";import"./index-B02yCj5F.js";import"./useForwardPropsEmits-Bg8EFT5z.js";import"./house-B8Sz2ej8.js";import"./mail-DAB1OMWZ.js";const le={class:"flex h-screen bg-background"},ae={class:"w-full p-6 space-y-8",dir:"rtl"},oe={class:"flex flex-col md:flex-row gap-4 items-end"},re={class:"flex flex-col"},ne={class:"flex flex-col"},ue={class:"flex flex-col"},de=["value"],ie={class:"grid grid-cols-1 md:grid-cols-3 gap-6"},ce={class:"text-2xl font-bold text-primary"},me={class:"text-2xl font-bold text-green-500"},fe={class:"text-2xl font-bold text-green-500"},_e={class:"space-y-4"},pe={class:"flex items-start justify-between mb-4"},ve={class:"space-y-1"},xe={class:"flex items-center gap-2"},ge={class:"font-bold text-primary"},ye={class:"ml-1 capitalize"},be={class:"text-sm text-muted-foreground"},we={class:"flex flex-col items-end gap-1"},he={class:"font-bold text-lg"},ke={class:"flex flex-col flex-wrap gap-4"},Ce=["src"],Ve={dir:"ltr",class:"w-full flex flex-col items-end"},Pe={class:"font-medium"},$e={dir:"ltr",class:"w-full flex flex-col items-end"},De={class:"font-medium"},Se={class:"text-sm text-muted-foreground"},je={class:"text-sm text-muted-foreground"},Be={key:0,class:"text-center py-8"},Ue={key:1,class:"flex justify-center py-8"},We=q({__name:"EarningsPage",setup(Ne){const k=d([]),m=d(!1),D=d(""),f=d({}),_=d(""),p=d(""),V=d(null),v=d(1),S=d(50),j=d([]),I=A(()=>Math.ceil(f.value.sum_of_orders/S.value)),P=async()=>{if(!_.value||!p.value){B.warning("اختار تاريخ البداية والنهاية الأول");return}m.value=!0;try{const r=await G.get("/admins/orders",{params:{from:_.value,to:p.value,city:V.value,page:v.value}});f.value=r.data.stats||{},k.value=r.data.orders||[],j.value=r.data.cities,console.log(r.data)}catch(r){D.value=r.message||"فشل في جلب الطلبات",B.error(D.value)}finally{m.value=!1}},L=()=>f.value.delivery_cost*.15;O(async()=>{const r=new Date().toISOString().split("T")[0];_.value=r,p.value=r,await P()});function M(r){switch(r){case"preparing":return C(h,{class:"h-4 w-4"});case"ready":return C(se,{class:"h-4 w-4"});case"picked-up":return C(te,{class:"h-4 w-4"});default:return C(h,{class:"h-4 w-4"})}}function F(r){switch(r){case"preparing":return"bg-yellow-500/10 text-yellow-500 border-yellow-500/20";case"ready":return"bg-green-500/10 text-green-500 border-green-500/20";case"picked-up":return"bg-primary/10 text-primary border-primary/20";default:return"bg-gray-500/10 text-gray-500 border-gray-500/20"}}return R(v,async(r,e)=>{r!==e&&await P()}),(r,e)=>(u(),i("div",le,[s(Z),t("div",ae,[s(l(g),null,{default:o(()=>[s(l(y),null,{default:o(()=>[s(l(b),null,{default:o(()=>[...e[4]||(e[4]=[c("بحث حسب التاريخ",-1)])]),_:1}),s(l(T),null,{default:o(()=>[c("استعرض كل الطلبات بين التاريخين المحددين (صفحة "+n(v.value)+" من "+n(I.value)+")",1)]),_:1})]),_:1}),s(l(w),null,{default:o(()=>[t("div",oe,[t("div",re,[e[5]||(e[5]=t("label",{class:"text-sm font-medium mb-1"},"من تاريخ",-1)),s(l(z),{type:"date",modelValue:_.value,"onUpdate:modelValue":e[0]||(e[0]=a=>_.value=a)},null,8,["modelValue"])]),t("div",ne,[e[6]||(e[6]=t("label",{class:"text-sm font-medium mb-1"},"إلى تاريخ",-1)),s(l(z),{type:"date",modelValue:p.value,"onUpdate:modelValue":e[1]||(e[1]=a=>p.value=a)},null,8,["modelValue"])]),t("div",ue,[e[8]||(e[8]=t("label",{class:"text-sm font-medium mb-1"},"المدينة",-1)),H(t("select",{"onUpdate:modelValue":e[2]||(e[2]=a=>V.value=a),class:"w-full mt-1 px-3 py-1 text-sm border border-border rounded-md"},[e[7]||(e[7]=t("option",{disabled:"",selected:"",value:null},"كل المدن",-1)),(u(!0),i(U,null,N(j.value,a=>(u(),i("option",{value:a.city_name,key:a.city_name},n(a.city_name),9,de))),128))],512),[[J,V.value]])]),s(l(W),{onClick:P,disabled:m.value},{default:o(()=>[m.value?(u(),$(l(E),{key:0,class:"mr-2 h-4 w-4 animate-spin"})):x("",!0),e[9]||(e[9]=c(" بحث ",-1))]),_:1},8,["disabled"])])]),_:1})]),_:1}),t("div",ie,[s(l(g),null,{default:o(()=>[s(l(y),{class:"flex flex-row items-center justify-between space-y-0 pb-2"},{default:o(()=>[s(l(b),{class:"text-sm font-medium"},{default:o(()=>[...e[10]||(e[10]=[c("المبلغ الإجمالي للطلبات",-1)])]),_:1}),s(l(h),{class:"h-4 w-4 text-muted-foreground"})]),_:1}),s(l(w),null,{default:o(()=>[t("div",ce,n(f.value.total_price)+" ج.م ",1)]),_:1})]),_:1}),s(l(g),null,{default:o(()=>[s(l(y),{class:"flex flex-row items-center justify-between space-y-0 pb-2"},{default:o(()=>[s(l(b),{class:"text-sm font-medium"},{default:o(()=>[...e[11]||(e[11]=[c(" إجمالي تكلفة التوصيل ",-1)])]),_:1}),s(l(ee),{class:"h-4 w-4 text-muted-foreground"})]),_:1}),s(l(w),null,{default:o(()=>[t("div",me,n(f.value.delivery_cost)+" ج.م ",1)]),_:1})]),_:1}),s(l(g),null,{default:o(()=>[s(l(y),{class:"flex flex-row items-center justify-between space-y-0 pb-2"},{default:o(()=>[s(l(b),{class:"text-sm font-medium"},{default:o(()=>[...e[12]||(e[12]=[c(" الأرباح من تكلفة التوصيل ",-1)])]),_:1}),s(l(h),{class:"h-4 w-4 text-muted-foreground"})]),_:1}),s(l(w),null,{default:o(()=>[t("div",fe,n(L())+" ج.م ",1)]),_:1})]),_:1})]),s(l(g),null,{default:o(()=>[s(l(y),null,{default:o(()=>[s(l(b),null,{default:o(()=>[...e[13]||(e[13]=[c("الطلبات",-1)])]),_:1}),s(l(T),null,{default:o(()=>[...e[14]||(e[14]=[c(" استعرض كل الطلبات بين التاريخين المحددين ",-1)])]),_:1})]),_:1}),s(l(w),null,{default:o(()=>[t("div",_e,[(u(!0),i(U,null,N(k.value,a=>(u(),i("div",{key:a.id,class:"border border-border rounded-lg p-4"},[t("div",pe,[t("div",ve,[t("div",xe,[t("span",ge,"#"+n(a.order_id),1),s(l(X),{class:K(F(a.order_status))},{default:o(()=>[(u(),$(Q(M(a.order_status)),{class:"h-3 w-3"})),t("span",ye,n(a.order_status.replace("-"," ")),1)]),_:2},1032,["class"])]),t("p",be,n(a.created_at),1)]),t("div",we,[t("span",he," تكلفة الطلب: "+n(a.order_total_price)+" ج.م ",1),t("span",null," تكلفة التوصيل: "+n(a.order_delivery_cost)+" ج.م ",1),t("span",null," صافي الربح: "+n(a.order_delivery_cost*.15)+" ج.م ",1)])]),t("div",ke,[a.order_receipt?(u(),i("img",{key:0,src:"https://deliveryshop.webmadeeasy.online"+a.order_receipt,alt:"Receipt Image",class:"h-36 w-36 rounded-md object-cover"},null,8,Ce)):x("",!0),t("div",Ve,[t("p",Pe,n(a.restaurant_name)+" : اسم المطعم ",1),t("p",null,n(a.restaurant_address)+" : عنوان المطعم",1)]),t("div",$e,[t("p",De,n(a.user_name)+" : الاسم",1),t("p",Se,n(a.user_phone)+" : التليفون ",1),t("p",je,n(a.user_address)+" : العنوان ",1)])])]))),128)),!m.value&&!k.value.length?(u(),i("div",Be,[s(l(h),{class:"h-12 w-12 text-muted-foreground mx-auto mb-4"}),e[15]||(e[15]=t("p",{class:"text-muted-foreground"},"مافيش طلبات للفترة المحددة",-1))])):x("",!0),m.value?(u(),i("div",Ue,[s(l(E),{class:"h-8 w-8 animate-spin text-primary"})])):x("",!0),!m.value&&k.value.length>0?(u(),$(Y,{key:2,"current-page":v.value,"total-items":f.value.sum_of_orders,"items-per-page":S.value,"onUpdate:currentPage":e[3]||(e[3]=a=>v.value=a)},null,8,["current-page","total-items","items-per-page"])):x("",!0)])]),_:1})]),_:1})])]))}});export{We as default};
+import {
+  d as q,
+  f as d,
+  D as A,
+  h as O,
+  B as R,
+  e as i,
+  a as s,
+  b as t,
+  w as o,
+  u as l,
+  A as B,
+  z as G,
+  o as u,
+  k as c,
+  t as n,
+  x as H,
+  U as J,
+  F as U,
+  l as N,
+  c as $,
+  q as x,
+  n as K,
+  p as Q,
+  C,
+} from "./index-CTakD6A6.js";
+import {
+  _ as g,
+  a as y,
+  b,
+  c as w,
+} from "./CardTitle.vue_vue_type_script_setup_true_lang-DXNmbM2X.js";
+import { _ as T } from "./CardDescription.vue_vue_type_script_setup_true_lang-CqkYoIfs.js";
+import { _ as W } from "./createLucideIcon-Dne6exBT.js";
+import { _ as z } from "./Input.vue_vue_type_script_setup_true_lang-DPaSW7O1.js";
+import { _ as X } from "./index-DaZ9IdLv.js";
+import { _ as Y } from "./CustomPagination.vue_vue_type_script_setup_true_lang-BHUexTDH.js";
+import { _ as Z } from "./Sidebar.vue_vue_type_script_setup_true_lang-D7ms-d9E.js";
+import { L as E } from "./loader-circle-_XBcZ5kY.js";
+import { C as h } from "./clock-CCw5LDAO.js";
+import { C as ee } from "./circle-check-big-rjFRL17W.js";
+import { T as te, P as se } from "./truck-C0S8qbak.js";
+import "./index-B02yCj5F.js";
+import "./useForwardPropsEmits-Bg8EFT5z.js";
+import "./house-B8Sz2ej8.js";
+import "./mail-DAB1OMWZ.js";
+const le = { class: "flex h-screen bg-background" },
+  ae = { class: "w-full p-6 space-y-8", dir: "rtl" },
+  oe = { class: "flex flex-col md:flex-row gap-4 items-end" },
+  re = { class: "flex flex-col" },
+  ne = { class: "flex flex-col" },
+  ue = { class: "flex flex-col" },
+  de = ["value"],
+  ie = { class: "grid grid-cols-1 md:grid-cols-3 gap-6" },
+  ce = { class: "text-2xl font-bold text-primary" },
+  me = { class: "text-2xl font-bold text-green-500" },
+  fe = { class: "text-2xl font-bold text-green-500" },
+  _e = { class: "space-y-4" },
+  pe = { class: "flex items-start justify-between mb-4" },
+  ve = { class: "space-y-1" },
+  xe = { class: "flex items-center gap-2" },
+  ge = { class: "font-bold text-primary" },
+  ye = { class: "ml-1 capitalize" },
+  be = { class: "text-sm text-muted-foreground" },
+  we = { class: "flex flex-col items-end gap-1" },
+  he = { class: "font-bold text-lg" },
+  ke = { class: "flex flex-col flex-wrap gap-4" },
+  Ce = ["src"],
+  Ve = { dir: "ltr", class: "w-full flex flex-col items-end" },
+  Pe = { class: "font-medium" },
+  $e = { dir: "ltr", class: "w-full flex flex-col items-end" },
+  De = { class: "font-medium" },
+  Se = { class: "text-sm text-muted-foreground" },
+  je = { class: "text-sm text-muted-foreground" },
+  Be = { key: 0, class: "text-center py-8" },
+  Ue = { key: 1, class: "flex justify-center py-8" },
+  We = q({
+    __name: "EarningsPage",
+    setup(Ne) {
+      const k = d([]),
+        m = d(!1),
+        D = d(""),
+        f = d({}),
+        _ = d(""),
+        p = d(""),
+        V = d(null),
+        v = d(1),
+        S = d(50),
+        j = d([]),
+        I = A(() => Math.ceil(f.value.sum_of_orders / S.value)),
+        P = async () => {
+          if (!_.value || !p.value) {
+            B.warning("اختار تاريخ البداية والنهاية الأول");
+            return;
+          }
+          m.value = !0;
+          try {
+            const r = await G.get("/admins/orders", {
+              params: {
+                from: _.value,
+                to: p.value,
+                city: V.value,
+                page: v.value,
+              },
+            });
+            (f.value = r.data.stats || {}),
+              (k.value = r.data.orders || []),
+              (j.value = r.data.cities),
+              console.log(r.data);
+          } catch (r) {
+            (D.value = r.message || "فشل في جلب الطلبات"), B.error(D.value);
+          } finally {
+            m.value = !1;
+          }
+        },
+        L = () => f.value.delivery_cost * 0.15;
+      O(async () => {
+        const r = new Date().toISOString().split("T")[0];
+        (_.value = r), (p.value = r), await P();
+      });
+      function M(r) {
+        switch (r) {
+          case "preparing":
+            return C(h, { class: "h-4 w-4" });
+          case "ready":
+            return C(se, { class: "h-4 w-4" });
+          case "picked-up":
+            return C(te, { class: "h-4 w-4" });
+          default:
+            return C(h, { class: "h-4 w-4" });
+        }
+      }
+      function F(r) {
+        switch (r) {
+          case "preparing":
+            return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
+          case "ready":
+            return "bg-green-500/10 text-green-500 border-green-500/20";
+          case "picked-up":
+            return "bg-primary/10 text-primary border-primary/20";
+          default:
+            return "bg-gray-500/10 text-gray-500 border-gray-500/20";
+        }
+      }
+      return (
+        R(v, async (r, e) => {
+          r !== e && (await P());
+        }),
+        (r, e) => (
+          u(),
+          i("div", le, [
+            s(Z),
+            t("div", ae, [
+              s(l(g), null, {
+                default: o(() => [
+                  s(l(y), null, {
+                    default: o(() => [
+                      s(l(b), null, {
+                        default: o(() => [
+                          ...(e[4] || (e[4] = [c("بحث حسب التاريخ", -1)])),
+                        ]),
+                        _: 1,
+                      }),
+                      s(l(T), null, {
+                        default: o(() => [
+                          c(
+                            "استعرض كل الطلبات بين التاريخين المحددين (صفحة " +
+                              n(v.value) +
+                              " من " +
+                              n(I.value) +
+                              ")",
+                            1
+                          ),
+                        ]),
+                        _: 1,
+                      }),
+                    ]),
+                    _: 1,
+                  }),
+                  s(l(w), null, {
+                    default: o(() => [
+                      t("div", oe, [
+                        t("div", re, [
+                          e[5] ||
+                            (e[5] = t(
+                              "label",
+                              { class: "text-sm font-medium mb-1" },
+                              "من تاريخ",
+                              -1
+                            )),
+                          s(
+                            l(z),
+                            {
+                              type: "date",
+                              modelValue: _.value,
+                              "onUpdate:modelValue":
+                                e[0] || (e[0] = (a) => (_.value = a)),
+                            },
+                            null,
+                            8,
+                            ["modelValue"]
+                          ),
+                        ]),
+                        t("div", ne, [
+                          e[6] ||
+                            (e[6] = t(
+                              "label",
+                              { class: "text-sm font-medium mb-1" },
+                              "إلى تاريخ",
+                              -1
+                            )),
+                          s(
+                            l(z),
+                            {
+                              type: "date",
+                              modelValue: p.value,
+                              "onUpdate:modelValue":
+                                e[1] || (e[1] = (a) => (p.value = a)),
+                            },
+                            null,
+                            8,
+                            ["modelValue"]
+                          ),
+                        ]),
+                        t("div", ue, [
+                          e[8] ||
+                            (e[8] = t(
+                              "label",
+                              { class: "text-sm font-medium mb-1" },
+                              "المدينة",
+                              -1
+                            )),
+                          H(
+                            t(
+                              "select",
+                              {
+                                "onUpdate:modelValue":
+                                  e[2] || (e[2] = (a) => (V.value = a)),
+                                class:
+                                  "w-full mt-1 px-3 py-1 text-sm border border-border rounded-md",
+                              },
+                              [
+                                e[7] ||
+                                  (e[7] = t(
+                                    "option",
+                                    { disabled: "", selected: "", value: null },
+                                    "كل المدن",
+                                    -1
+                                  )),
+                                (u(!0),
+                                i(
+                                  U,
+                                  null,
+                                  N(
+                                    j.value,
+                                    (a) => (
+                                      u(),
+                                      i(
+                                        "option",
+                                        {
+                                          value: a.city_name,
+                                          key: a.city_name,
+                                        },
+                                        n(a.city_name),
+                                        9,
+                                        de
+                                      )
+                                    )
+                                  ),
+                                  128
+                                )),
+                              ],
+                              512
+                            ),
+                            [[J, V.value]]
+                          ),
+                        ]),
+                        s(
+                          l(W),
+                          { onClick: P, disabled: m.value },
+                          {
+                            default: o(() => [
+                              m.value
+                                ? (u(),
+                                  $(l(E), {
+                                    key: 0,
+                                    class: "mr-2 h-4 w-4 animate-spin",
+                                  }))
+                                : x("", !0),
+                              e[9] || (e[9] = c(" بحث ", -1)),
+                            ]),
+                            _: 1,
+                          },
+                          8,
+                          ["disabled"]
+                        ),
+                      ]),
+                    ]),
+                    _: 1,
+                  }),
+                ]),
+                _: 1,
+              }),
+              t("div", ie, [
+                s(l(g), null, {
+                  default: o(() => [
+                    s(
+                      l(y),
+                      {
+                        class:
+                          "flex flex-row items-center justify-between space-y-0 pb-2",
+                      },
+                      {
+                        default: o(() => [
+                          s(
+                            l(b),
+                            { class: "text-sm font-medium" },
+                            {
+                              default: o(() => [
+                                ...(e[10] ||
+                                  (e[10] = [c("المبلغ الإجمالي للطلبات", -1)])),
+                              ]),
+                              _: 1,
+                            }
+                          ),
+                          s(l(h), { class: "h-4 w-4 text-muted-foreground" }),
+                        ]),
+                        _: 1,
+                      }
+                    ),
+                    s(l(w), null, {
+                      default: o(() => [
+                        t("div", ce, n(f.value.total_price) + " ج.م ", 1),
+                      ]),
+                      _: 1,
+                    }),
+                  ]),
+                  _: 1,
+                }),
+                s(l(g), null, {
+                  default: o(() => [
+                    s(
+                      l(y),
+                      {
+                        class:
+                          "flex flex-row items-center justify-between space-y-0 pb-2",
+                      },
+                      {
+                        default: o(() => [
+                          s(
+                            l(b),
+                            { class: "text-sm font-medium" },
+                            {
+                              default: o(() => [
+                                ...(e[11] ||
+                                  (e[11] = [c(" إجمالي تكلفة التوصيل ", -1)])),
+                              ]),
+                              _: 1,
+                            }
+                          ),
+                          s(l(ee), { class: "h-4 w-4 text-muted-foreground" }),
+                        ]),
+                        _: 1,
+                      }
+                    ),
+                    s(l(w), null, {
+                      default: o(() => [
+                        t("div", me, n(f.value.delivery_cost) + " ج.م ", 1),
+                      ]),
+                      _: 1,
+                    }),
+                  ]),
+                  _: 1,
+                }),
+                s(l(g), null, {
+                  default: o(() => [
+                    s(
+                      l(y),
+                      {
+                        class:
+                          "flex flex-row items-center justify-between space-y-0 pb-2",
+                      },
+                      {
+                        default: o(() => [
+                          s(
+                            l(b),
+                            { class: "text-sm font-medium" },
+                            {
+                              default: o(() => [
+                                ...(e[12] ||
+                                  (e[12] = [
+                                    c(" الأرباح من تكلفة التوصيل ", -1),
+                                  ])),
+                              ]),
+                              _: 1,
+                            }
+                          ),
+                          s(l(h), { class: "h-4 w-4 text-muted-foreground" }),
+                        ]),
+                        _: 1,
+                      }
+                    ),
+                    s(l(w), null, {
+                      default: o(() => [t("div", fe, n(L()) + " ج.م ", 1)]),
+                      _: 1,
+                    }),
+                  ]),
+                  _: 1,
+                }),
+              ]),
+              s(l(g), null, {
+                default: o(() => [
+                  s(l(y), null, {
+                    default: o(() => [
+                      s(l(b), null, {
+                        default: o(() => [
+                          ...(e[13] || (e[13] = [c("الطلبات", -1)])),
+                        ]),
+                        _: 1,
+                      }),
+                      s(l(T), null, {
+                        default: o(() => [
+                          ...(e[14] ||
+                            (e[14] = [
+                              c(
+                                " استعرض كل الطلبات بين التاريخين المحددين ",
+                                -1
+                              ),
+                            ])),
+                        ]),
+                        _: 1,
+                      }),
+                    ]),
+                    _: 1,
+                  }),
+                  s(l(w), null, {
+                    default: o(() => [
+                      t("div", _e, [
+                        (u(!0),
+                        i(
+                          U,
+                          null,
+                          N(
+                            k.value,
+                            (a) => (
+                              u(),
+                              i(
+                                "div",
+                                {
+                                  key: a.id,
+                                  class: "border border-border rounded-lg p-4",
+                                },
+                                [
+                                  t("div", pe, [
+                                    t("div", ve, [
+                                      t("div", xe, [
+                                        t("span", ge, "#" + n(a.order_id), 1),
+                                        s(
+                                          l(X),
+                                          { class: K(F(a.order_status)) },
+                                          {
+                                            default: o(() => [
+                                              (u(),
+                                              $(Q(M(a.order_status)), {
+                                                class: "h-3 w-3",
+                                              })),
+                                              t(
+                                                "span",
+                                                ye,
+                                                n(
+                                                  a.order_status.replace(
+                                                    "-",
+                                                    " "
+                                                  )
+                                                ),
+                                                1
+                                              ),
+                                            ]),
+                                            _: 2,
+                                          },
+                                          1032,
+                                          ["class"]
+                                        ),
+                                      ]),
+                                      t("p", be, n(a.created_at), 1),
+                                    ]),
+                                    t("div", we, [
+                                      t(
+                                        "span",
+                                        he,
+                                        " تكلفة الطلب: " +
+                                          n(a.order_total_price) +
+                                          " ج.م ",
+                                        1
+                                      ),
+                                      t(
+                                        "span",
+                                        null,
+                                        " تكلفة التوصيل: " +
+                                          n(a.order_delivery_cost) +
+                                          " ج.م ",
+                                        1
+                                      ),
+                                      t(
+                                        "span",
+                                        null,
+                                        " صافي الربح: " +
+                                          n(a.order_delivery_cost * 0.15) +
+                                          " ج.م ",
+                                        1
+                                      ),
+                                    ]),
+                                  ]),
+                                  t("div", ke, [
+                                    a.order_receipt
+                                      ? (u(),
+                                        i(
+                                          "img",
+                                          {
+                                            key: 0,
+                                            src:
+                                              "https://deliveryshop.cloud" +
+                                              a.order_receipt,
+                                            alt: "Receipt Image",
+                                            class:
+                                              "h-36 w-36 rounded-md object-cover",
+                                          },
+                                          null,
+                                          8,
+                                          Ce
+                                        ))
+                                      : x("", !0),
+                                    t("div", Ve, [
+                                      t(
+                                        "p",
+                                        Pe,
+                                        n(a.restaurant_name) + " : اسم المطعم ",
+                                        1
+                                      ),
+                                      t(
+                                        "p",
+                                        null,
+                                        n(a.restaurant_address) +
+                                          " : عنوان المطعم",
+                                        1
+                                      ),
+                                    ]),
+                                    t("div", $e, [
+                                      t(
+                                        "p",
+                                        De,
+                                        n(a.user_name) + " : الاسم",
+                                        1
+                                      ),
+                                      t(
+                                        "p",
+                                        Se,
+                                        n(a.user_phone) + " : التليفون ",
+                                        1
+                                      ),
+                                      t(
+                                        "p",
+                                        je,
+                                        n(a.user_address) + " : العنوان ",
+                                        1
+                                      ),
+                                    ]),
+                                  ]),
+                                ]
+                              )
+                            )
+                          ),
+                          128
+                        )),
+                        !m.value && !k.value.length
+                          ? (u(),
+                            i("div", Be, [
+                              s(l(h), {
+                                class:
+                                  "h-12 w-12 text-muted-foreground mx-auto mb-4",
+                              }),
+                              e[15] ||
+                                (e[15] = t(
+                                  "p",
+                                  { class: "text-muted-foreground" },
+                                  "مافيش طلبات للفترة المحددة",
+                                  -1
+                                )),
+                            ]))
+                          : x("", !0),
+                        m.value
+                          ? (u(),
+                            i("div", Ue, [
+                              s(l(E), {
+                                class: "h-8 w-8 animate-spin text-primary",
+                              }),
+                            ]))
+                          : x("", !0),
+                        !m.value && k.value.length > 0
+                          ? (u(),
+                            $(
+                              Y,
+                              {
+                                key: 2,
+                                "current-page": v.value,
+                                "total-items": f.value.sum_of_orders,
+                                "items-per-page": S.value,
+                                "onUpdate:currentPage":
+                                  e[3] || (e[3] = (a) => (v.value = a)),
+                              },
+                              null,
+                              8,
+                              ["current-page", "total-items", "items-per-page"]
+                            ))
+                          : x("", !0),
+                      ]),
+                    ]),
+                    _: 1,
+                  }),
+                ]),
+                _: 1,
+              }),
+            ]),
+          ])
+        )
+      );
+    },
+  });
+export { We as default };
