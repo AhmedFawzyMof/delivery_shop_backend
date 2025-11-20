@@ -51,10 +51,11 @@ const restaurant_login = async (req: Request, res: Response) => {
 };
 
 const driver_login = async (req: Request, res: Response) => {
-  const { id_number, password, shift, selfie } = req.body;
+  const { id_number, password, shift } = req.body;
+  const selfieFile = req.file;
 
-  if (!id_number || !password || !shift || !selfie) {
-    console.error(req.body);
+  if (!id_number || !password || !shift || !selfieFile) {
+    console.error(req.body, req.file);
     return res.status(422).json({ message: "Missing required fields" });
   }
 
@@ -70,7 +71,7 @@ const driver_login = async (req: Request, res: Response) => {
 
   const driverId = found[0].driver_id;
 
-  const selfiePath = await saveSelfie({ id: driverId, base64: selfie });
+  const selfiePath = selfieFile.path;
 
   const shiftDuration = Number(shift);
 

@@ -102,6 +102,7 @@ wss.on("connection", (ws: ExtWebSocket) => {
         ws.driver_status = data.driver_status;
         ws.driver_stationed_at = data.driver_stationed_at;
         ws.driver_orders = data.driver_orders;
+        ws.driver_location = data.location;
 
         driverClients.set(id, ws);
         console.log(`🚗 Driver ${id} connected via WebSocket`);
