@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import tryCatch from "../utils/trycatch";
 
 const getAllCities = async (req: Request, res: Response) => {
+  const { driver_id } = req.query;
   const { data: allCities, error } = await tryCatch(CitiesModel.getAllCities());
 
   if (error) {

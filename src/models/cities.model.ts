@@ -1,10 +1,32 @@
 import { db } from "../config/db";
-import { cities } from "../config/db/schema";
-import { eq } from "drizzle-orm";
+import { branches, cities, driver } from "../config/db/schema";
+import { and, eq } from "drizzle-orm";
 
 export class CitiesModel {
-  static async getAllCities() {
-    const allCities = await db.select().from(cities);
+  static async getAllCities(driverId?: number) {
+    const conditions: any[] = [];
+
+    if (driverId) {
+      const branch_id = await db
+        .select({ branch_id: branches.branch_id })
+        .from(driver)
+        .innerJoin(cities, eq(driver.driver_city, cities.city_id))
+        .innerJoin(branches, eq(cities.branch_id, branches.branch_id))
+        .where(eq(driver.driver_id, driverId))
+        .get();
+
+      if (branch_id) {
+        conditions.push(eq(cities.branch_id, branch_id?.branch_id));
+      }
+    }
+    const allCities = await db
+      .select({
+        city_id: cities.city_id,
+        city_name: cities.city_name,
+      })
+      .from(cities)
+      .where(and(...conditions));
+
     return allCities;
   }
 
