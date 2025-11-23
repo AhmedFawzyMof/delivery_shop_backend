@@ -4,7 +4,9 @@ import tryCatch from "../utils/trycatch";
 
 const getAllCities = async (req: Request, res: Response) => {
   const { driver_id } = req.query;
-  const { data: allCities, error } = await tryCatch(CitiesModel.getAllCities());
+  const { data: allCities, error } = await tryCatch(
+    CitiesModel.getAllCities(Number(driver_id))
+  );
 
   if (error) {
     console.log(error);
