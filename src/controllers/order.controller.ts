@@ -96,24 +96,24 @@ export const getOrderById = async (req: Request, res: Response) => {
 
 export const createOrder = async (req: Request, res: Response) => {
   const restaurant = (req as any).user;
-  const user = {
-    user_name: req.body.customerName,
-    user_phone: req.body.customerPhone,
-    user_address: req.body.customerAddress,
-    restaurant_id: restaurant.id,
-  };
+  // const user = {
+  //   user_name: req.body.customerName,
+  //   user_phone: req.body.customerPhone,
+  //   user_address: req.body.customerAddress,
+  //   restaurant_id: restaurant.id,
+  // };
 
-  const { data: user_data, error: user_error } = await tryCatch(
-    UserModel.create(user)
-  );
+  // const { data: user_data, error: user_error } = await tryCatch(
+  //   UserModel.create(user)
+  // );
 
-  if (user_error) {
-    res.status(500).json({ message: user_error.message });
-  }
+  // if (user_error) {
+  //   res.status(500).json({ message: user_error.message });
+  // }
 
-  if (!user_data) {
-    return res.status(500).json({ message: "Failed to create user" });
-  }
+  // if (!user_data) {
+  //   return res.status(500).json({ message: "Failed to create user" });
+  // }
 
   let imageUrl = "";
 
@@ -150,7 +150,6 @@ export const createOrder = async (req: Request, res: Response) => {
       order_status: "preparing",
       order_notes: req.body.notes,
       restaurant_id: restaurant.id,
-      user_id: user_data[0].user_id,
       order_receipt: imageUrl,
     })
   );
@@ -165,7 +164,7 @@ export const createOrder = async (req: Request, res: Response) => {
 
   broadcastToRestaurant(restaurant.id, {
     type: "new_order",
-    order: { ...order_data[0], ...user_data[0] },
+    order: { ...order_data[0] },
   });
 
   res.json({ success: true });
@@ -208,7 +207,7 @@ export const createOrder = async (req: Request, res: Response) => {
         ws.send(
           JSON.stringify({
             type: "new_order_nearby",
-            order: { ...order_data[0], user: user_data[0], restaurant },
+            order: { ...order_data[0], restaurant },
           })
         );
       }
