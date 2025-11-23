@@ -10,7 +10,7 @@ export class CitiesModel {
       const branch_id = await db
         .select({ branch_id: branches.branch_id })
         .from(driver)
-        .innerJoin(cities, eq(driver.driver_city, cities.city_id))
+        .innerJoin(cities, eq(driver.driver_city, cities.city_name))
         .innerJoin(branches, eq(cities.branch_id, branches.branch_id))
         .where(eq(driver.driver_id, driverId))
         .get();
