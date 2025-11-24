@@ -1,1 +1,928 @@
-import{d as O,f as p,z as E,e as f,p as L,b as e,a,u as n,v as x,x as _,F as y,k as C,P,t as v,w as i,A as h,o as d,c as R,j as g,g as G,n as T}from"./index-d-g9mRbR.js";import{_ as H}from"./index-cBp-nCgD.js";import{_ as F,b as j}from"./auth-BOWgCVVb.js";import{_ as J}from"./Sidebar.vue_vue_type_script_setup_true_lang-CIwOqECK.js";import{_ as z,a as M,b as N,c as V}from"./DropdownMenuTrigger.vue_vue_type_script_setup_true_lang-D8Ok4xwk.js";import{X as K}from"./x-BIILnT8m.js";import{S as A,B as Q}from"./star-CLk7fv17.js";import{_ as W,E as Y}from"./CustomPagination.vue_vue_type_script_setup_true_lang-DpwOP1tr.js";import{S as Z,F as ee}from"./search-BEWjTuhG.js";import{E as te}from"./eye-CdV7MRcD.js";import{C as se}from"./circle-check-big-C3-2RChK.js";import"./index-DYTBgUmH.js";import"./house-DvnnnsCD.js";import"./truck-J7k0Gy93.js";import"./mail-BeP-FzBI.js";import"./useForwardPropsEmits-D6-NodRW.js";import"./PopperContent-BvjY67ll.js";const oe={key:0,class:"fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"},re={class:"bg-card border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto"},le={class:"flex items-center justify-between p-6 border-b border-border sticky top-0 bg-card"},ne={class:"p-6 space-y-6"},ae={class:"flex items-start gap-4"},de={class:"w-16 h-16 rounded-lg bg-muted flex items-center justify-center text-4xl"},ue=["src","alt"],ie={class:"flex-1 space-y-2"},ce={class:"flex items-center gap-2 mt-2"},me={class:"bg-muted/30 rounded-lg p-4 space-y-3"},fe={class:"grid grid-cols-2 gap-4"},pe=["value"],ge={class:"col-span-2"},ve={class:"col-span-2"},xe={class:"bg-muted/30 rounded-lg p-4"},be={class:"bg-muted/30 rounded-lg p-4"},_e={class:"text-xs text-muted-foreground"},ye={class:"flex gap-3 p-6 border-t border-border bg-muted/20"},we=O({__name:"RestaurantDetailModal",props:{restaurant:{},cities:{},isOpen:{type:Boolean},onClose:{type:Function},onEdit:{type:Function}},setup(S){const u=S,b=p(u.isOpen);E(()=>u.isOpen,c=>{b.value=c});const r=p({...u.restaurant}),w=async()=>{try{await j.put(`/restaurants/${r.value.restaurant_id}`,r.value),u.onEdit(),h.success("تم التحديث بنجاح")}catch(c){console.error(c),h.error("فشل في التحديث")}};return E(()=>u.restaurant,c=>{console.log("newVal",c),r.value={...c}}),(c,t)=>b.value?(d(),f("div",oe,[e("div",re,[e("div",le,[t[10]||(t[10]=e("h2",{class:"text-xl font-bold text-foreground"},"تفاصيل المطعم",-1)),e("button",{onClick:t[0]||(t[0]=(...l)=>u.onClose&&u.onClose(...l)),class:"p-1 hover:bg-muted rounded transition-colors"},[a(n(K),{class:"w-5 h-5 text-foreground"})])]),e("div",ne,[e("div",ae,[e("div",de,[e("img",{src:`https://deliveryshop.webmadeeasy.online/${r.value.logo_image}`,alt:`${r.value.restaurant_name} logo`},null,8,ue)]),e("div",ie,[x(e("input",{"onUpdate:modelValue":t[1]||(t[1]=l=>r.value.restaurant_name=l),class:"w-full text-2xl font-bold text-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},null,512),[[_,r.value.restaurant_name]]),e("div",ce,[(d(!0),f(y,null,C(r.value.rate||0,l=>(d(),R(n(A),{key:l,class:"w-4 h-4 fill-yellow-500 text-yellow-500"}))),128)),x(e("input",{type:"number","onUpdate:modelValue":t[2]||(t[2]=l=>r.value.rate=l),min:"0",max:"5",class:"w-12 text-sm text-muted-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},null,512),[[_,r.value.rate]]),t[11]||(t[11]=e("span",{class:"text-sm text-muted-foreground"},"تقييم",-1))])])]),e("div",me,[t[16]||(t[16]=e("h3",{class:"font-semibold text-foreground"},"المعلومات الأساسية",-1)),e("div",fe,[e("div",null,[t[12]||(t[12]=e("p",{class:"text-xs text-muted-foreground"},"المدينة",-1)),x(e("select",{"onUpdate:modelValue":t[3]||(t[3]=l=>r.value.restaurant_city=l),class:"text-sm font-medium w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},[(d(!0),f(y,null,C(S.cities,l=>(d(),f("option",{value:l.city_name},v(l.city_name),9,pe))),256))],512),[[P,r.value.restaurant_city]])]),e("div",null,[t[13]||(t[13]=e("p",{class:"text-xs text-muted-foreground"},"السجل التجاري",-1)),x(e("input",{"onUpdate:modelValue":t[4]||(t[4]=l=>r.value.commercial_register=l),class:"text-sm text-foreground font-mono w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},null,512),[[_,r.value.commercial_register]])]),e("div",ge,[t[14]||(t[14]=e("p",{class:"text-xs text-muted-foreground"},"العنوان",-1)),x(e("input",{"onUpdate:modelValue":t[5]||(t[5]=l=>r.value.address=l),class:"text-sm text-foreground w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},null,512),[[_,r.value.address]])]),e("div",ve,[t[15]||(t[15]=e("p",{class:"text-xs text-muted-foreground"},"الموقع (الإحداثيات)",-1)),x(e("input",{"onUpdate:modelValue":t[6]||(t[6]=l=>r.value.location=l),class:"text-sm text-foreground font-mono w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},null,512),[[_,r.value.location]])])])]),e("div",xe,[t[18]||(t[18]=e("p",{class:"text-xs text-muted-foreground uppercase mb-2"},"الحالة",-1)),x(e("select",{"onUpdate:modelValue":t[7]||(t[7]=l=>r.value.is_baned=l),class:"text-sm font-medium w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},[...t[17]||(t[17]=[e("option",{value:!0},"محظور",-1),e("option",{value:!1},"نشط",-1)])],512),[[P,r.value.is_baned]])]),e("div",be,[t[19]||(t[19]=e("p",{class:"text-xs text-muted-foreground uppercase mb-2"}," كلمة المرور ",-1)),x(e("input",{"onUpdate:modelValue":t[8]||(t[8]=l=>r.value.password=l),placeholder:"يرجى تركه كما هو إذا كنت لا تريد تغييره",class:"text-sm text-foreground font-mono w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary"},null,512),[[_,r.value.password]])]),e("div",_e," تم إنشاء المطعم في "+v(r.value?new Date(r.value.created_at).toLocaleString():""),1)]),e("div",ye,[a(n(F),{onClick:u.onClose,variant:"outline"},{default:i(()=>[...t[20]||(t[20]=[g("إغلاق",-1)])]),_:1},8,["onClick"]),a(n(F),{onClick:t[9]||(t[9]=l=>w())},{default:i(()=>[...t[21]||(t[21]=[g("حفظ التعديلات",-1)])]),_:1})])])])):L("",!0)}}),$e={class:"flex h-screen bg-background"},ke={class:"w-full p-8 space-y-6"},Ce={class:"flex flex-col sm:flex-row gap-4"},he={class:"flex-1 relative"},Ve={class:"flex gap-2"},Re={class:"space-y-4"},Se={class:"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"},Ue={class:"p-4 border-b border-border flex items-start justify-between"},Be={class:"flex items-start gap-3 flex-1"},Ee={class:"w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-2xl"},Fe=["src","alt"],je={class:"flex-1 min-w-0"},De={class:"font-semibold text-foreground truncate"},Pe={class:"text-xs text-muted-foreground"},Te={class:"p-1 hover:bg-muted rounded transition-colors"},ze={class:"p-4 space-y-3"},Me={class:"flex items-center justify-between"},Ne={class:"flex items-center gap-1"},Oe={class:"text-xs font-medium text-muted-foreground"},Le={class:"text-xs space-y-1"},Ae={class:"text-muted-foreground"},Ie={class:"text-muted-foreground truncate"},Xe={class:"flex gap-2 pt-2"},qe={key:1,class:"col-span-full text-center py-12"},ut=O({__name:"RestaurantPage",setup(S){const u=p(""),b=p(null),r=p(1),w=p(null),c=p(!1),t=p(new Set),l=p([]),U=p([]),B=p([]),$=async()=>{try{const m=new URLSearchParams;m.append("page",r.value.toString()),u.value.trim()!==""&&m.append("search",encodeURIComponent(u.value.trim())),b.value&&m.append("city",b.value);const s=await j.get(`/restaurants?${m.toString()}`);l.value=s.data.restaurants.totalCount,B.value=s.data.restaurants.result,U.value=s.data.cities}catch{h.error("فشل في جلب المطاعم")}},D=m=>{b.value=m,r.value=1,$()},I=async(m,s)=>{try{(await j.put(`/restaurants/${m}?ban=${s}`)).data.success&&$(),h.success("تم تغيير حالة المطعم")}catch{h.error("فشل في تغيير حالة المطعم")}};function X(m,s=500){let o;return(...k)=>{clearTimeout(o),o=window.setTimeout(()=>m(...k),s)}}const q=X($,500);return G(()=>{$()}),E(u,()=>{q()}),(m,s)=>(d(),f("div",$e,[a(J),e("div",ke,[s[12]||(s[12]=e("div",null,[e("h1",{class:"text-3xl font-bold text-foreground"},"المطاعم"),e("p",{class:"text-muted-foreground mt-1"}," إدارة المطاعم الشريكة وتفاصيلها ")],-1)),e("div",Ce,[e("div",he,[a(n(Z),{class:"absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground"}),x(e("input",{type:"text",placeholder:"ابحث بالاسم أو المدينة...","onUpdate:modelValue":s[0]||(s[0]=o=>u.value=o),class:"w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"},null,512),[[_,u.value]])]),e("div",Ve,[a(n(z),null,{default:i(()=>[a(n(M),{asChild:""},{default:i(()=>[a(n(F),{variant:"outline",size:"sm",class:"gap-2 bg-transparent"},{default:i(()=>[a(n(ee),{class:"w-4 h-4"}),g(" "+v(b.value?`المدينة: ${b.value}`:"المدينة"),1)]),_:1})]),_:1}),a(n(N),null,{default:i(()=>[a(n(V),{onClick:s[1]||(s[1]=o=>D(null))},{default:i(()=>[...s[5]||(s[5]=[g("كل المدن",-1)])]),_:1}),(d(!0),f(y,null,C(U.value.map(o=>o.city_name),o=>(d(),R(n(V),{key:o,onClick:k=>D(o)},{default:i(()=>[g(v(o),1)]),_:2},1032,["onClick"]))),128))]),_:1})]),_:1})])]),e("div",Re,[e("div",Se,[B.value.length>0?(d(!0),f(y,{key:0},C(B.value,o=>(d(),f("div",{key:o.restaurant_id,class:T(["bg-card border rounded-lg overflow-hidden transition-all",t.value.has(o.restaurant_id)?"border-red-500/50 bg-red-500/5":"border-border hover:border-primary hover:shadow-lg"])},[e("div",Ue,[e("div",Be,[e("div",Ee,[e("img",{src:`https://deliveryshop.webmadeeasy.online/${o.logo_image}`,alt:`${o.restaurant_name} logo`},null,8,Fe)]),e("div",je,[e("h3",De,v(o.restaurant_name),1),e("p",Pe,v(o.restaurant_city),1)])]),a(n(z),null,{default:i(()=>[a(n(M),{asChild:""},{default:i(()=>[e("button",Te,[a(n(Y),{class:"w-4 h-4 text-muted-foreground"})])]),_:1}),a(n(N),{align:"end"},{default:i(()=>[a(n(V),{onClick:()=>{w.value=o,c.value=!0}},{default:i(()=>[a(n(te),{class:"w-4 h-4 mr-2"}),s[6]||(s[6]=g(" عرض التفاصيل ",-1))]),_:1},8,["onClick"]),a(n(V),{onClick:k=>I(o.restaurant_id,!o.is_baned)},{default:i(()=>[t.value.has(o.restaurant_id)?(d(),f(y,{key:0},[a(n(se),{class:"w-4 h-4 mr-2"}),s[7]||(s[7]=g(" إلغاء الحظر ",-1))],64)):(d(),f(y,{key:1},[a(n(Q),{class:"w-4 h-4 mr-2"}),s[8]||(s[8]=g(" حظر ",-1))],64))]),_:2},1032,["onClick"])]),_:2},1024)]),_:2},1024)]),e("div",ze,[e("div",Me,[e("div",Ne,[(d(!0),f(y,null,C(o.rate,k=>(d(),R(n(A),{key:k,class:"w-4 h-4 fill-yellow-500 text-yellow-500"}))),128))]),e("span",Oe,v(o.rate)+".0 تقييم",1)]),e("div",Le,[e("p",Ae,[s[9]||(s[9]=e("span",{class:"font-medium text-foreground"},"رقم السجل التجاري:",-1)),g(" "+v(o.commercial_register),1)]),e("p",Ie,[s[10]||(s[10]=e("span",{class:"font-medium text-foreground"},"العنوان:",-1)),g(" "+v(o.address),1)])]),e("div",Xe,[a(n(H),{class:T(o.is_baned?"bg-red-500/20 text-red-600":"bg-green-500/20 text-green-600")},{default:i(()=>[g(v(o.is_baned?"محظور":"نشط"),1)]),_:2},1032,["class"])])])],2))),128)):(d(),f("div",qe,[...s[11]||(s[11]=[e("p",{class:"text-muted-foreground"},"لا توجد مطاعم",-1)])]))]),a(W,{"current-page":r.value,"total-items":l.value,"items-per-page":50,"onUpdate:currentPage":s[2]||(s[2]=o=>r.value=o)},null,8,["current-page","total-items"])]),w.value?(d(),R(we,{key:0,restaurant:w.value,cities:U.value,"is-open":c.value,onClose:s[3]||(s[3]=o=>c.value=!1),onEdit:s[4]||(s[4]=()=>{c.value=!1,$()})},null,8,["restaurant","cities","is-open"])):L("",!0)])]))}});export{ut as default};
+import {
+  d as O,
+  f as p,
+  z as E,
+  e as f,
+  p as L,
+  b as e,
+  a,
+  u as n,
+  v as x,
+  x as _,
+  F as y,
+  k as C,
+  P,
+  t as v,
+  w as i,
+  A as h,
+  o as d,
+  c as R,
+  j as g,
+  g as G,
+  n as T,
+} from "./index-d-g9mRbR.js";
+import { _ as H } from "./index-cBp-nCgD.js";
+import { _ as F, b as j } from "./auth-BOWgCVVb.js";
+import { _ as J } from "./Sidebar.vue_vue_type_script_setup_true_lang-CIwOqECK.js";
+import {
+  _ as z,
+  a as M,
+  b as N,
+  c as V,
+} from "./DropdownMenuTrigger.vue_vue_type_script_setup_true_lang-D8Ok4xwk.js";
+import { X as K } from "./x-BIILnT8m.js";
+import { S as A, B as Q } from "./star-CLk7fv17.js";
+import {
+  _ as W,
+  E as Y,
+} from "./CustomPagination.vue_vue_type_script_setup_true_lang-DpwOP1tr.js";
+import { S as Z, F as ee } from "./search-BEWjTuhG.js";
+import { E as te } from "./eye-CdV7MRcD.js";
+import { C as se } from "./circle-check-big-C3-2RChK.js";
+import "./index-DYTBgUmH.js";
+import "./house-DvnnnsCD.js";
+import "./truck-J7k0Gy93.js";
+import "./mail-BeP-FzBI.js";
+import "./useForwardPropsEmits-D6-NodRW.js";
+import "./PopperContent-BvjY67ll.js";
+const oe = {
+    key: 0,
+    class:
+      "fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4",
+  },
+  re = {
+    class:
+      "bg-card border border-border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto",
+  },
+  le = {
+    class:
+      "flex items-center justify-between p-6 border-b border-border sticky top-0 bg-card",
+  },
+  ne = { class: "p-6 space-y-6" },
+  ae = { class: "flex items-start gap-4" },
+  de = {
+    class:
+      "w-16 h-16 rounded-lg bg-muted flex items-center justify-center text-4xl",
+  },
+  ue = ["src", "alt"],
+  ie = { class: "flex-1 space-y-2" },
+  ce = { class: "flex items-center gap-2 mt-2" },
+  me = { class: "bg-muted/30 rounded-lg p-4 space-y-3" },
+  fe = { class: "grid grid-cols-2 gap-4" },
+  pe = ["value"],
+  ge = { class: "col-span-2" },
+  ve = { class: "col-span-2" },
+  xe = { class: "bg-muted/30 rounded-lg p-4" },
+  be = { class: "bg-muted/30 rounded-lg p-4" },
+  _e = { class: "text-xs text-muted-foreground" },
+  ye = { class: "flex gap-3 p-6 border-t border-border bg-muted/20" },
+  we = O({
+    __name: "RestaurantDetailModal",
+    props: {
+      restaurant: {},
+      cities: {},
+      isOpen: { type: Boolean },
+      onClose: { type: Function },
+      onEdit: { type: Function },
+    },
+    setup(S) {
+      const u = S,
+        b = p(u.isOpen);
+      E(
+        () => u.isOpen,
+        (c) => {
+          b.value = c;
+        }
+      );
+      const r = p({ ...u.restaurant }),
+        w = async () => {
+          try {
+            await j.put(`/restaurants/${r.value.restaurant_id}`, r.value),
+              u.onEdit(),
+              h.success("تم التحديث بنجاح");
+          } catch (c) {
+            console.error(c), h.error("فشل في التحديث");
+          }
+        };
+      return (
+        E(
+          () => u.restaurant,
+          (c) => {
+            console.log("newVal", c), (r.value = { ...c });
+          }
+        ),
+        (c, t) =>
+          b.value
+            ? (d(),
+              f("div", oe, [
+                e("div", re, [
+                  e("div", le, [
+                    t[10] ||
+                      (t[10] = e(
+                        "h2",
+                        { class: "text-xl font-bold text-foreground" },
+                        "تفاصيل المطعم",
+                        -1
+                      )),
+                    e(
+                      "button",
+                      {
+                        onClick:
+                          t[0] ||
+                          (t[0] = (...l) => u.onClose && u.onClose(...l)),
+                        class: "p-1 hover:bg-muted rounded transition-colors",
+                      },
+                      [a(n(K), { class: "w-5 h-5 text-foreground" })]
+                    ),
+                  ]),
+                  e("div", ne, [
+                    e("div", ae, [
+                      e("div", de, [
+                        e(
+                          "img",
+                          {
+                            src: `https://deliveryshop.cloud/${r.value.logo_image}`,
+                            alt: `${r.value.restaurant_name} logo`,
+                          },
+                          null,
+                          8,
+                          ue
+                        ),
+                      ]),
+                      e("div", ie, [
+                        x(
+                          e(
+                            "input",
+                            {
+                              "onUpdate:modelValue":
+                                t[1] ||
+                                (t[1] = (l) => (r.value.restaurant_name = l)),
+                              class:
+                                "w-full text-2xl font-bold text-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                            },
+                            null,
+                            512
+                          ),
+                          [[_, r.value.restaurant_name]]
+                        ),
+                        e("div", ce, [
+                          (d(!0),
+                          f(
+                            y,
+                            null,
+                            C(
+                              r.value.rate || 0,
+                              (l) => (
+                                d(),
+                                R(n(A), {
+                                  key: l,
+                                  class:
+                                    "w-4 h-4 fill-yellow-500 text-yellow-500",
+                                })
+                              )
+                            ),
+                            128
+                          )),
+                          x(
+                            e(
+                              "input",
+                              {
+                                type: "number",
+                                "onUpdate:modelValue":
+                                  t[2] || (t[2] = (l) => (r.value.rate = l)),
+                                min: "0",
+                                max: "5",
+                                class:
+                                  "w-12 text-sm text-muted-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                              },
+                              null,
+                              512
+                            ),
+                            [[_, r.value.rate]]
+                          ),
+                          t[11] ||
+                            (t[11] = e(
+                              "span",
+                              { class: "text-sm text-muted-foreground" },
+                              "تقييم",
+                              -1
+                            )),
+                        ]),
+                      ]),
+                    ]),
+                    e("div", me, [
+                      t[16] ||
+                        (t[16] = e(
+                          "h3",
+                          { class: "font-semibold text-foreground" },
+                          "المعلومات الأساسية",
+                          -1
+                        )),
+                      e("div", fe, [
+                        e("div", null, [
+                          t[12] ||
+                            (t[12] = e(
+                              "p",
+                              { class: "text-xs text-muted-foreground" },
+                              "المدينة",
+                              -1
+                            )),
+                          x(
+                            e(
+                              "select",
+                              {
+                                "onUpdate:modelValue":
+                                  t[3] ||
+                                  (t[3] = (l) => (r.value.restaurant_city = l)),
+                                class:
+                                  "text-sm font-medium w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                              },
+                              [
+                                (d(!0),
+                                f(
+                                  y,
+                                  null,
+                                  C(
+                                    S.cities,
+                                    (l) => (
+                                      d(),
+                                      f(
+                                        "option",
+                                        { value: l.city_name },
+                                        v(l.city_name),
+                                        9,
+                                        pe
+                                      )
+                                    )
+                                  ),
+                                  256
+                                )),
+                              ],
+                              512
+                            ),
+                            [[P, r.value.restaurant_city]]
+                          ),
+                        ]),
+                        e("div", null, [
+                          t[13] ||
+                            (t[13] = e(
+                              "p",
+                              { class: "text-xs text-muted-foreground" },
+                              "السجل التجاري",
+                              -1
+                            )),
+                          x(
+                            e(
+                              "input",
+                              {
+                                "onUpdate:modelValue":
+                                  t[4] ||
+                                  (t[4] = (l) =>
+                                    (r.value.commercial_register = l)),
+                                class:
+                                  "text-sm text-foreground font-mono w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                              },
+                              null,
+                              512
+                            ),
+                            [[_, r.value.commercial_register]]
+                          ),
+                        ]),
+                        e("div", ge, [
+                          t[14] ||
+                            (t[14] = e(
+                              "p",
+                              { class: "text-xs text-muted-foreground" },
+                              "العنوان",
+                              -1
+                            )),
+                          x(
+                            e(
+                              "input",
+                              {
+                                "onUpdate:modelValue":
+                                  t[5] || (t[5] = (l) => (r.value.address = l)),
+                                class:
+                                  "text-sm text-foreground w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                              },
+                              null,
+                              512
+                            ),
+                            [[_, r.value.address]]
+                          ),
+                        ]),
+                        e("div", ve, [
+                          t[15] ||
+                            (t[15] = e(
+                              "p",
+                              { class: "text-xs text-muted-foreground" },
+                              "الموقع (الإحداثيات)",
+                              -1
+                            )),
+                          x(
+                            e(
+                              "input",
+                              {
+                                "onUpdate:modelValue":
+                                  t[6] ||
+                                  (t[6] = (l) => (r.value.location = l)),
+                                class:
+                                  "text-sm text-foreground font-mono w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                              },
+                              null,
+                              512
+                            ),
+                            [[_, r.value.location]]
+                          ),
+                        ]),
+                      ]),
+                    ]),
+                    e("div", xe, [
+                      t[18] ||
+                        (t[18] = e(
+                          "p",
+                          {
+                            class:
+                              "text-xs text-muted-foreground uppercase mb-2",
+                          },
+                          "الحالة",
+                          -1
+                        )),
+                      x(
+                        e(
+                          "select",
+                          {
+                            "onUpdate:modelValue":
+                              t[7] || (t[7] = (l) => (r.value.is_baned = l)),
+                            class:
+                              "text-sm font-medium w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                          },
+                          [
+                            ...(t[17] ||
+                              (t[17] = [
+                                e("option", { value: !0 }, "محظور", -1),
+                                e("option", { value: !1 }, "نشط", -1),
+                              ])),
+                          ],
+                          512
+                        ),
+                        [[P, r.value.is_baned]]
+                      ),
+                    ]),
+                    e("div", be, [
+                      t[19] ||
+                        (t[19] = e(
+                          "p",
+                          {
+                            class:
+                              "text-xs text-muted-foreground uppercase mb-2",
+                          },
+                          " كلمة المرور ",
+                          -1
+                        )),
+                      x(
+                        e(
+                          "input",
+                          {
+                            "onUpdate:modelValue":
+                              t[8] || (t[8] = (l) => (r.value.password = l)),
+                            placeholder:
+                              "يرجى تركه كما هو إذا كنت لا تريد تغييره",
+                            class:
+                              "text-sm text-foreground font-mono w-full border-b border-border focus:outline-none focus:ring-1 focus:ring-primary",
+                          },
+                          null,
+                          512
+                        ),
+                        [[_, r.value.password]]
+                      ),
+                    ]),
+                    e(
+                      "div",
+                      _e,
+                      " تم إنشاء المطعم في " +
+                        v(
+                          r.value
+                            ? new Date(r.value.created_at).toLocaleString()
+                            : ""
+                        ),
+                      1
+                    ),
+                  ]),
+                  e("div", ye, [
+                    a(
+                      n(F),
+                      { onClick: u.onClose, variant: "outline" },
+                      {
+                        default: i(() => [
+                          ...(t[20] || (t[20] = [g("إغلاق", -1)])),
+                        ]),
+                        _: 1,
+                      },
+                      8,
+                      ["onClick"]
+                    ),
+                    a(
+                      n(F),
+                      { onClick: t[9] || (t[9] = (l) => w()) },
+                      {
+                        default: i(() => [
+                          ...(t[21] || (t[21] = [g("حفظ التعديلات", -1)])),
+                        ]),
+                        _: 1,
+                      }
+                    ),
+                  ]),
+                ]),
+              ]))
+            : L("", !0)
+      );
+    },
+  }),
+  $e = { class: "flex h-screen bg-background" },
+  ke = { class: "w-full p-8 space-y-6" },
+  Ce = { class: "flex flex-col sm:flex-row gap-4" },
+  he = { class: "flex-1 relative" },
+  Ve = { class: "flex gap-2" },
+  Re = { class: "space-y-4" },
+  Se = { class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+  Ue = { class: "p-4 border-b border-border flex items-start justify-between" },
+  Be = { class: "flex items-start gap-3 flex-1" },
+  Ee = {
+    class:
+      "w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-2xl",
+  },
+  Fe = ["src", "alt"],
+  je = { class: "flex-1 min-w-0" },
+  De = { class: "font-semibold text-foreground truncate" },
+  Pe = { class: "text-xs text-muted-foreground" },
+  Te = { class: "p-1 hover:bg-muted rounded transition-colors" },
+  ze = { class: "p-4 space-y-3" },
+  Me = { class: "flex items-center justify-between" },
+  Ne = { class: "flex items-center gap-1" },
+  Oe = { class: "text-xs font-medium text-muted-foreground" },
+  Le = { class: "text-xs space-y-1" },
+  Ae = { class: "text-muted-foreground" },
+  Ie = { class: "text-muted-foreground truncate" },
+  Xe = { class: "flex gap-2 pt-2" },
+  qe = { key: 1, class: "col-span-full text-center py-12" },
+  ut = O({
+    __name: "RestaurantPage",
+    setup(S) {
+      const u = p(""),
+        b = p(null),
+        r = p(1),
+        w = p(null),
+        c = p(!1),
+        t = p(new Set()),
+        l = p([]),
+        U = p([]),
+        B = p([]),
+        $ = async () => {
+          try {
+            const m = new URLSearchParams();
+            m.append("page", r.value.toString()),
+              u.value.trim() !== "" &&
+                m.append("search", encodeURIComponent(u.value.trim())),
+              b.value && m.append("city", b.value);
+            const s = await j.get(`/restaurants?${m.toString()}`);
+            (l.value = s.data.restaurants.totalCount),
+              (B.value = s.data.restaurants.result),
+              (U.value = s.data.cities);
+          } catch {
+            h.error("فشل في جلب المطاعم");
+          }
+        },
+        D = (m) => {
+          (b.value = m), (r.value = 1), $();
+        },
+        I = async (m, s) => {
+          try {
+            (await j.put(`/restaurants/${m}?ban=${s}`)).data.success && $(),
+              h.success("تم تغيير حالة المطعم");
+          } catch {
+            h.error("فشل في تغيير حالة المطعم");
+          }
+        };
+      function X(m, s = 500) {
+        let o;
+        return (...k) => {
+          clearTimeout(o), (o = window.setTimeout(() => m(...k), s));
+        };
+      }
+      const q = X($, 500);
+      return (
+        G(() => {
+          $();
+        }),
+        E(u, () => {
+          q();
+        }),
+        (m, s) => (
+          d(),
+          f("div", $e, [
+            a(J),
+            e("div", ke, [
+              s[12] ||
+                (s[12] = e(
+                  "div",
+                  null,
+                  [
+                    e(
+                      "h1",
+                      { class: "text-3xl font-bold text-foreground" },
+                      "المطاعم"
+                    ),
+                    e(
+                      "p",
+                      { class: "text-muted-foreground mt-1" },
+                      " إدارة المطاعم الشريكة وتفاصيلها "
+                    ),
+                  ],
+                  -1
+                )),
+              e("div", Ce, [
+                e("div", he, [
+                  a(n(Z), {
+                    class:
+                      "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground",
+                  }),
+                  x(
+                    e(
+                      "input",
+                      {
+                        type: "text",
+                        placeholder: "ابحث بالاسم أو المدينة...",
+                        "onUpdate:modelValue":
+                          s[0] || (s[0] = (o) => (u.value = o)),
+                        class:
+                          "w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary",
+                      },
+                      null,
+                      512
+                    ),
+                    [[_, u.value]]
+                  ),
+                ]),
+                e("div", Ve, [
+                  a(n(z), null, {
+                    default: i(() => [
+                      a(
+                        n(M),
+                        { asChild: "" },
+                        {
+                          default: i(() => [
+                            a(
+                              n(F),
+                              {
+                                variant: "outline",
+                                size: "sm",
+                                class: "gap-2 bg-transparent",
+                              },
+                              {
+                                default: i(() => [
+                                  a(n(ee), { class: "w-4 h-4" }),
+                                  g(
+                                    " " +
+                                      v(
+                                        b.value
+                                          ? `المدينة: ${b.value}`
+                                          : "المدينة"
+                                      ),
+                                    1
+                                  ),
+                                ]),
+                                _: 1,
+                              }
+                            ),
+                          ]),
+                          _: 1,
+                        }
+                      ),
+                      a(n(N), null, {
+                        default: i(() => [
+                          a(
+                            n(V),
+                            { onClick: s[1] || (s[1] = (o) => D(null)) },
+                            {
+                              default: i(() => [
+                                ...(s[5] || (s[5] = [g("كل المدن", -1)])),
+                              ]),
+                              _: 1,
+                            }
+                          ),
+                          (d(!0),
+                          f(
+                            y,
+                            null,
+                            C(
+                              U.value.map((o) => o.city_name),
+                              (o) => (
+                                d(),
+                                R(
+                                  n(V),
+                                  { key: o, onClick: (k) => D(o) },
+                                  { default: i(() => [g(v(o), 1)]), _: 2 },
+                                  1032,
+                                  ["onClick"]
+                                )
+                              )
+                            ),
+                            128
+                          )),
+                        ]),
+                        _: 1,
+                      }),
+                    ]),
+                    _: 1,
+                  }),
+                ]),
+              ]),
+              e("div", Re, [
+                e("div", Se, [
+                  B.value.length > 0
+                    ? (d(!0),
+                      f(
+                        y,
+                        { key: 0 },
+                        C(
+                          B.value,
+                          (o) => (
+                            d(),
+                            f(
+                              "div",
+                              {
+                                key: o.restaurant_id,
+                                class: T([
+                                  "bg-card border rounded-lg overflow-hidden transition-all",
+                                  t.value.has(o.restaurant_id)
+                                    ? "border-red-500/50 bg-red-500/5"
+                                    : "border-border hover:border-primary hover:shadow-lg",
+                                ]),
+                              },
+                              [
+                                e("div", Ue, [
+                                  e("div", Be, [
+                                    e("div", Ee, [
+                                      e(
+                                        "img",
+                                        {
+                                          src: `https://deliveryshop.cloud/${o.logo_image}`,
+                                          alt: `${o.restaurant_name} logo`,
+                                        },
+                                        null,
+                                        8,
+                                        Fe
+                                      ),
+                                    ]),
+                                    e("div", je, [
+                                      e("h3", De, v(o.restaurant_name), 1),
+                                      e("p", Pe, v(o.restaurant_city), 1),
+                                    ]),
+                                  ]),
+                                  a(
+                                    n(z),
+                                    null,
+                                    {
+                                      default: i(() => [
+                                        a(
+                                          n(M),
+                                          { asChild: "" },
+                                          {
+                                            default: i(() => [
+                                              e("button", Te, [
+                                                a(n(Y), {
+                                                  class:
+                                                    "w-4 h-4 text-muted-foreground",
+                                                }),
+                                              ]),
+                                            ]),
+                                            _: 1,
+                                          }
+                                        ),
+                                        a(
+                                          n(N),
+                                          { align: "end" },
+                                          {
+                                            default: i(() => [
+                                              a(
+                                                n(V),
+                                                {
+                                                  onClick: () => {
+                                                    (w.value = o),
+                                                      (c.value = !0);
+                                                  },
+                                                },
+                                                {
+                                                  default: i(() => [
+                                                    a(n(te), {
+                                                      class: "w-4 h-4 mr-2",
+                                                    }),
+                                                    s[6] ||
+                                                      (s[6] = g(
+                                                        " عرض التفاصيل ",
+                                                        -1
+                                                      )),
+                                                  ]),
+                                                  _: 1,
+                                                },
+                                                8,
+                                                ["onClick"]
+                                              ),
+                                              a(
+                                                n(V),
+                                                {
+                                                  onClick: (k) =>
+                                                    I(
+                                                      o.restaurant_id,
+                                                      !o.is_baned
+                                                    ),
+                                                },
+                                                {
+                                                  default: i(() => [
+                                                    t.value.has(o.restaurant_id)
+                                                      ? (d(),
+                                                        f(
+                                                          y,
+                                                          { key: 0 },
+                                                          [
+                                                            a(n(se), {
+                                                              class:
+                                                                "w-4 h-4 mr-2",
+                                                            }),
+                                                            s[7] ||
+                                                              (s[7] = g(
+                                                                " إلغاء الحظر ",
+                                                                -1
+                                                              )),
+                                                          ],
+                                                          64
+                                                        ))
+                                                      : (d(),
+                                                        f(
+                                                          y,
+                                                          { key: 1 },
+                                                          [
+                                                            a(n(Q), {
+                                                              class:
+                                                                "w-4 h-4 mr-2",
+                                                            }),
+                                                            s[8] ||
+                                                              (s[8] = g(
+                                                                " حظر ",
+                                                                -1
+                                                              )),
+                                                          ],
+                                                          64
+                                                        )),
+                                                  ]),
+                                                  _: 2,
+                                                },
+                                                1032,
+                                                ["onClick"]
+                                              ),
+                                            ]),
+                                            _: 2,
+                                          },
+                                          1024
+                                        ),
+                                      ]),
+                                      _: 2,
+                                    },
+                                    1024
+                                  ),
+                                ]),
+                                e("div", ze, [
+                                  e("div", Me, [
+                                    e("div", Ne, [
+                                      (d(!0),
+                                      f(
+                                        y,
+                                        null,
+                                        C(
+                                          o.rate,
+                                          (k) => (
+                                            d(),
+                                            R(n(A), {
+                                              key: k,
+                                              class:
+                                                "w-4 h-4 fill-yellow-500 text-yellow-500",
+                                            })
+                                          )
+                                        ),
+                                        128
+                                      )),
+                                    ]),
+                                    e("span", Oe, v(o.rate) + ".0 تقييم", 1),
+                                  ]),
+                                  e("div", Le, [
+                                    e("p", Ae, [
+                                      s[9] ||
+                                        (s[9] = e(
+                                          "span",
+                                          {
+                                            class:
+                                              "font-medium text-foreground",
+                                          },
+                                          "رقم السجل التجاري:",
+                                          -1
+                                        )),
+                                      g(" " + v(o.commercial_register), 1),
+                                    ]),
+                                    e("p", Ie, [
+                                      s[10] ||
+                                        (s[10] = e(
+                                          "span",
+                                          {
+                                            class:
+                                              "font-medium text-foreground",
+                                          },
+                                          "العنوان:",
+                                          -1
+                                        )),
+                                      g(" " + v(o.address), 1),
+                                    ]),
+                                  ]),
+                                  e("div", Xe, [
+                                    a(
+                                      n(H),
+                                      {
+                                        class: T(
+                                          o.is_baned
+                                            ? "bg-red-500/20 text-red-600"
+                                            : "bg-green-500/20 text-green-600"
+                                        ),
+                                      },
+                                      {
+                                        default: i(() => [
+                                          g(v(o.is_baned ? "محظور" : "نشط"), 1),
+                                        ]),
+                                        _: 2,
+                                      },
+                                      1032,
+                                      ["class"]
+                                    ),
+                                  ]),
+                                ]),
+                              ],
+                              2
+                            )
+                          )
+                        ),
+                        128
+                      ))
+                    : (d(),
+                      f("div", qe, [
+                        ...(s[11] ||
+                          (s[11] = [
+                            e(
+                              "p",
+                              { class: "text-muted-foreground" },
+                              "لا توجد مطاعم",
+                              -1
+                            ),
+                          ])),
+                      ])),
+                ]),
+                a(
+                  W,
+                  {
+                    "current-page": r.value,
+                    "total-items": l.value,
+                    "items-per-page": 50,
+                    "onUpdate:currentPage":
+                      s[2] || (s[2] = (o) => (r.value = o)),
+                  },
+                  null,
+                  8,
+                  ["current-page", "total-items"]
+                ),
+              ]),
+              w.value
+                ? (d(),
+                  R(
+                    we,
+                    {
+                      key: 0,
+                      restaurant: w.value,
+                      cities: U.value,
+                      "is-open": c.value,
+                      onClose: s[3] || (s[3] = (o) => (c.value = !1)),
+                      onEdit:
+                        s[4] ||
+                        (s[4] = () => {
+                          (c.value = !1), $();
+                        }),
+                    },
+                    null,
+                    8,
+                    ["restaurant", "cities", "is-open"]
+                  ))
+                : L("", !0),
+            ]),
+          ])
+        )
+      );
+    },
+  });
+export { ut as default };
