@@ -93,6 +93,9 @@ export default async function searchForDrivers(
     }
 
     console.log(`🔍 No drivers in ${radius}km, retrying...`);
+    if (radius === 12) {
+      break;
+    }
     radius += radiusStepKm;
 
     await new Promise((r) => setTimeout(r, intervalMs));

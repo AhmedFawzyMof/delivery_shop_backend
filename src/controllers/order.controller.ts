@@ -150,6 +150,7 @@ export const createOrder = async (req: Request, res: Response) => {
       order_status: "preparing",
       order_notes: req.body.notes,
       restaurant_id: restaurant.id,
+      order_city: req.body.order_city,
       order_receipt: imageUrl,
     })
   );
@@ -189,9 +190,13 @@ export const createOrder = async (req: Request, res: Response) => {
         return;
       }
 
+      if (order_data[0].order_city) {
+        return;
+      }
+
       const drivers = await searchForDrivers(
         restaurant.id,
-        restaurant.city,
+        order_data[0].order_city ? order_data[0].order_city : "",
         location.lat,
         location.lng,
         driverClients

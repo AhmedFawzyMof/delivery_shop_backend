@@ -69,6 +69,7 @@ export const order = sqliteTable("order", {
   order_delivery_cost: integer("order_delivery_cost"),
   order_status: text("order_status"),
   order_receipt: text("order_receipt"),
+  order_city: text("order_city"),
   pickup_image: text("pickup_image"),
   order_notes: text("order_notes"),
   user_id: integer("user_id").references(() => user.user_id),
