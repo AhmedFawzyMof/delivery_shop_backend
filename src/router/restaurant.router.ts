@@ -16,7 +16,7 @@ const router = express.Router();
 router.get("/", authMiddleware, getAllRestaurants);
 router.get("/:id", authMiddleware, getRestaurantById);
 router.post("/register", createRestaurant);
-router.post("/", authMiddleware, upload.single("logo_image"), createRestaurant);
+router.post("/", authMiddleware, upload.single("logo"), createRestaurant);
 router.put("/:id", authMiddleware, updateRestaurant);
 router.delete("/:id", authMiddleware, deleteRestaurant);
 

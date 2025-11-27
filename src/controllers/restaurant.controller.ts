@@ -76,6 +76,11 @@ export const createRestaurant = async (req: Request, res: Response) => {
     }
   }
 
+  const hashedPassword = crypto
+    .createHash("sha256")
+    .update(password)
+    .digest("hex");
+
   const { data, error } = await tryCatch(
     RestaurantModel.create({
       restaurant_name,
@@ -84,7 +89,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
       address,
       commercial_register,
       location: "",
-      password: crypto.createHash("sha256").update(password).digest("hex"),
+      password: hashedPassword,
     })
   );
 

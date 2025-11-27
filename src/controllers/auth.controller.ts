@@ -5,7 +5,6 @@ import { AdminModel } from "../models/admin.model";
 import crypto from "crypto";
 import { createSessionToken, verifySessionToken } from "../utils/token";
 import { Request, Response } from "express";
-import { saveSelfie } from "../utils/saveSelfie";
 import { hashPassword } from "../utils/hashPassword";
 import { cleanupFile } from "../utils/cleanupFile";
 import { handleLoginRecord } from "../utils/handleLoginRecord";
@@ -140,7 +139,7 @@ const admin_login = async (req: Request, res: Response) => {
 
   const sessionToken = createSessionToken({ ...data }, "1d");
 
-  res.json({
+  res.status(200).json({
     user: data,
     sessionToken,
   });

@@ -1,7 +1,7 @@
 import { ExtWebSocket } from "..";
 
 const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 6371; // km
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -44,7 +44,7 @@ async function findNearbyDrivers(
 
 export default async function searchForDrivers(
   restaurant_id: number,
-  restaurant_city: string,
+  order_city: string,
   lat: number,
   lon: number,
   drivers: Map<number, ExtWebSocket>,
@@ -59,18 +59,18 @@ export default async function searchForDrivers(
     (ws) =>
       ws.driver_stationed_at === restaurant_id &&
       ws.driver_status === "READY" &&
-      ws.driver_city === restaurant_city
+      ws.driver_city === order_city
   );
 
   if (stationedDrivers.length > 0) {
     console.log(
-      `✅ Found ${stationedDrivers.length} stationed drivers in ${restaurant_city}`
+      `✅ Found ${stationedDrivers.length} stationed drivers in ${order_city}`
     );
     return stationedDrivers;
   }
 
   console.log(
-    `🔍 No stationed drivers available in ${restaurant_city}, searching by radius...`
+    `🔍 No stationed drivers available in ${order_city}, searching by radius...`
   );
 
   const start = Date.now();
@@ -81,13 +81,13 @@ export default async function searchForDrivers(
       lat,
       lon,
       radius,
-      restaurant_city,
+      order_city,
       drivers
     );
 
     if (found.length > 0) {
       console.log(
-        `✅ Found ${found.length} drivers within ${radius}km in ${restaurant_city}`
+        `✅ Found ${found.length} drivers within ${radius}km in ${order_city}`
       );
       return found;
     }
