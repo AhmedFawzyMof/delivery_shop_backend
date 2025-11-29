@@ -73,7 +73,6 @@ export class OrderModel {
     const result = await db
       .selectDistinct({
         order_id: order.order_id,
-        user_id: order.user_id,
         restaurant_id: order.restaurant_id,
         restaurant_name: restaurant.restaurant_name,
         restaurant_address: restaurant.address,
@@ -92,12 +91,8 @@ export class OrderModel {
         ready_at: order.ready_at,
         picked_up_at: order.picked_up_at,
         delivered_at: order.delivered_at,
-        user_name: user.user_name,
-        user_phone: user.user_phone,
-        user_address: user.user_address,
       })
       .from(order)
-      .innerJoin(user, eq(order.user_id, user.user_id))
       .leftJoin(driver, eq(order.driver_id, driver.driver_id))
       .leftJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
       .leftJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
@@ -129,7 +124,6 @@ export class OrderModel {
     return await db
       .selectDistinct({
         order_id: order.order_id,
-        user_id: order.user_id,
         restaurant_id: order.restaurant_id,
         order_total_price: order.order_total_price,
         order_status: order.order_status,
@@ -138,12 +132,8 @@ export class OrderModel {
         order_notes: order.order_notes,
         driver_id: order.driver_id,
         created_at: order.created_at,
-        user_name: user.user_name,
-        user_phone: user.user_phone,
-        user_address: user.user_address,
       })
       .from(order)
-      .innerJoin(user, eq(order.user_id, user.user_id))
       .where(
         and(
           eq(order.restaurant_id, restaurant_id),
@@ -186,7 +176,6 @@ export class OrderModel {
     return await db
       .select({
         order_id: order.order_id,
-        user_id: order.user_id,
         restaurant_id: order.restaurant_id,
         order_total_price: order.order_total_price,
         order_status: order.order_status,
@@ -195,14 +184,10 @@ export class OrderModel {
         order_notes: order.order_notes,
         driver_id: order.driver_id,
         created_at: order.created_at,
-        user_name: user.user_name,
-        user_phone: user.user_phone,
-        user_address: user.user_address,
         restaurant_name: restaurant.restaurant_name,
         restaurant_address: restaurant.address,
       })
       .from(order)
-      .innerJoin(user, eq(order.user_id, user.user_id))
       .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
       .innerJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
       .where(and(...conditions))
@@ -300,7 +285,6 @@ export class OrderModel {
     const result = await db
       .select({
         order_id: order.order_id,
-        user_id: order.user_id,
         restaurant_id: order.restaurant_id,
         restaurant_name: restaurant.restaurant_name,
         restaurant_address: restaurant.address,
@@ -312,12 +296,8 @@ export class OrderModel {
         order_notes: order.order_notes,
         driver_id: order.driver_id,
         created_at: order.created_at,
-        user_name: user.user_name,
-        user_phone: user.user_phone,
-        user_address: user.user_address,
       })
       .from(order)
-      .innerJoin(user, eq(order.user_id, user.user_id))
       .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
       .where(eq(order.order_id, id))
       .get();
@@ -330,7 +310,6 @@ export class OrderModel {
     return db
       .select({
         order_id: order.order_id,
-        user_id: order.user_id,
         restaurant_id: order.restaurant_id,
         restaurant_name: restaurant.restaurant_name,
         restaurant_address: restaurant.address,
@@ -345,12 +324,8 @@ export class OrderModel {
         picked_up_at: order.picked_up_at,
         delivered_at: order.delivered_at,
         created_at: order.created_at,
-        user_name: user.user_name,
-        user_phone: user.user_phone,
-        user_address: user.user_address,
       })
       .from(order)
-      .innerJoin(user, eq(order.user_id, user.user_id))
       .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
       .where(eq(order.order_id, id))
       .get();
@@ -375,11 +350,6 @@ export class OrderModel {
         order_status: order.order_status,
         order_total_price: order.order_total_price,
         order_delivery_cost: order.order_delivery_cost,
-        user: {
-          user_name: user.user_name,
-          user_phone: user.user_phone,
-          user_address: user.user_address,
-        },
         restaurant: {
           restaurant_id: restaurant.restaurant_id,
           restaurant_name: restaurant.restaurant_name,
@@ -389,7 +359,6 @@ export class OrderModel {
       })
       .from(order)
       .innerJoin(sub, eq(sub.order_id, order.order_id))
-      .innerJoin(user, eq(order.user_id, user.user_id))
       .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id));
   }
 
@@ -429,16 +398,11 @@ export class OrderModel {
         order_total_price: order.order_total_price,
         order_delivery_cost: order.order_delivery_cost,
         order_receipt: order.order_receipt,
-        user_id: user.user_id,
-        user_name: user.user_name,
-        user_phone: user.user_phone,
-        user_address: user.user_address,
         restaurant_id: restaurant.restaurant_id,
         restaurant_name: restaurant.restaurant_name,
         restaurant_address: restaurant.address,
       })
       .from(order)
-      .innerJoin(user, eq(order.user_id, user.user_id))
       .innerJoin(restaurant, eq(order.restaurant_id, user.restaurant_id))
       .where(
         and(

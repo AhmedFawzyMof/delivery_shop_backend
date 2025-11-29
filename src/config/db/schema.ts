@@ -74,7 +74,6 @@ export const order = sqliteTable("order", {
   order_city: text("order_city"),
   pickup_image: text("pickup_image"),
   order_notes: text("order_notes"),
-  user_id: integer("user_id").references(() => user.user_id),
   driver_id: integer("driver_id").references(() => driver.driver_id),
   restaurant_id: integer("restaurant_id").references(
     () => restaurant.restaurant_id

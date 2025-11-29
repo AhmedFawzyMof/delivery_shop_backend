@@ -127,7 +127,6 @@ export const createOrder = async (req: Request, res: Response) => {
       imageUrl = `/images/receipt/${webpFileName}`;
     }
 
-    // ---------------- INSERT ORDER ----------------
     const { data: order_data, error: order_error } = await tryCatch(
       OrderModel.create({
         order_total_price: Number(req.body.totalAmount),
@@ -148,10 +147,8 @@ export const createOrder = async (req: Request, res: Response) => {
       return res.status(500).json({ message: "Failed to create order" });
     }
 
-    // Drizzle ALWAYS returns an array:
     const order = order_data[0];
 
-    // ---------------- BROADCAST TO RESTAURANT ----------------
     broadcastToRestaurant(restaurant.id, {
       type: "new_order",
       order,
@@ -159,7 +156,6 @@ export const createOrder = async (req: Request, res: Response) => {
 
     res.json({ success: true });
 
-    // ---------------- BACKGROUND DRIVER SEARCH ----------------
     setImmediate(async () => {
       try {
         let location = restaurant.location;
@@ -339,12 +335,6 @@ export const assignOrder = async (req: Request, res: Response) => {
       address: data.restaurant_address,
     };
 
-    const user = {
-      user_name: data.user_name,
-      user_phone: data.user_phone,
-      user_address: data.user_address,
-    };
-
     const order = { ...data };
 
     const wsClient = driverClients.get(Number(req.body.driver_id));
@@ -353,7 +343,7 @@ export const assignOrder = async (req: Request, res: Response) => {
       wsClient.send(
         JSON.stringify({
           type: "new_order_nearby",
-          order: { ...order, user, restaurant },
+          order: { ...order, restaurant },
         })
       );
       return res.json({ success: true });
