@@ -49,6 +49,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
     address,
     commercial_register,
     password,
+    location,
   } = req.body;
 
   let imagePath = "";
@@ -81,6 +82,18 @@ export const createRestaurant = async (req: Request, res: Response) => {
     .update(password)
     .digest("hex");
 
+  let parsedLocation = null;
+
+  if (location && typeof location === "string" && location.includes(",")) {
+    const [latStr, lngStr] = location.split(",").map((v) => v.trim());
+    parsedLocation = {
+      lat: parseFloat(latStr),
+      lng: parseFloat(lngStr),
+    };
+  } else {
+    return res.status(400).json({ message: "Invalid location format" });
+  }
+
   const { data, error } = await tryCatch(
     RestaurantModel.create({
       restaurant_name,
@@ -88,7 +101,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
       logo_image: imagePath,
       address,
       commercial_register,
-      location: "",
+      location: JSON.stringify(parsedLocation),
       password: hashedPassword,
     })
   );
