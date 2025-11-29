@@ -128,6 +128,7 @@ const addDriver = async (req: Request, res: Response) => {
     "driver_city",
     "id_number",
     "plate_number",
+    "stationed_at",
     "password",
     "is_baned",
   ];
@@ -294,6 +295,7 @@ const editDriver = async (req: Request, res: Response) => {
     "driver_city",
     "id_number",
     "plate_number",
+    "stationed_at",
     "password",
     "is_baned",
     "freelancer",
