@@ -51,7 +51,16 @@ const router = express.Router();
 
 router.get("/", authMiddleware, getAllDrivers);
 router.get("/:id", authMiddleware, getDriverById);
-router.post("/register", addDriver);
+router.post(
+  "/register",
+  upload.fields([
+    { name: "first_license_photo", maxCount: 1 },
+    { name: "second_license_photo", maxCount: 1 },
+    { name: "third_license_photo", maxCount: 1 },
+    { name: "fourth_license_photo", maxCount: 1 },
+  ]),
+  addDriver
+);
 router.post(
   "/",
   authMiddleware,

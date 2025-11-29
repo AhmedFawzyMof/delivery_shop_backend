@@ -232,21 +232,54 @@ export const updateOrder = async (req: Request, res: Response) => {
   const orderIdToUpdate = id;
   const newOrderStatus = req.body.order_status;
   const restaurantId = req.body.restaurant_id;
+  const currentDate = new Date().toISOString();
 
   if (updateStatus) {
-    const { data, error } = await tryCatch(
-      OrderModel.update(id, {
-        order_status: req.body.order_status,
-      })
-    );
+    let orderData;
+    let orderError;
+    if (req.body.order_status === "delivered") {
+      const { data, error } = await tryCatch(
+        OrderModel.update(id, {
+          order_status: req.body.order_status,
+          delivered_at: currentDate,
+        })
+      );
 
-    if (error) {
-      res.status(500).json({ message: error.message });
+      orderData = data;
+      orderError = error;
+    }
+
+    if (req.body.order_status === "picked-up") {
+      const { data, error } = await tryCatch(
+        OrderModel.update(id, {
+          order_status: req.body.order_status,
+          picked_up_at: currentDate,
+        })
+      );
+
+      orderData = data;
+      orderError = error;
+    }
+
+    if (req.body.order_status === "ready") {
+      const { data, error } = await tryCatch(
+        OrderModel.update(id, {
+          order_status: req.body.order_status,
+          ready_at: currentDate,
+        })
+      );
+
+      orderData = data;
+      orderError = error;
+    }
+
+    if (orderError) {
+      res.status(500).json({ message: orderError.message });
     }
 
     broadcastToRestaurant(req.body.restaurant_id, {
       type: "order_status_updated",
-      order: data,
+      order: orderData,
     });
 
     for (const ws of driverClients.values()) {

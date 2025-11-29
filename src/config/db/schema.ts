@@ -35,6 +35,8 @@ export const driver = sqliteTable("driver", {
   password: text("password"),
   rate: integer("rate"),
   created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  freelancer: integer("freelancer", { mode: "boolean" }).default(false),
+  shift_duration: integer("shift_duration").default(10),
 });
 
 export const driver_login_record = sqliteTable("driver_login_record", {
@@ -78,6 +80,9 @@ export const order = sqliteTable("order", {
     () => restaurant.restaurant_id
   ),
   created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  ready_at: text("ready_at"),
+  picked_up_at: text("picked_up_at"),
+  delivered_at: text("delivered_at"),
 });
 
 export const cities = sqliteTable("cities", {

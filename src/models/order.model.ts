@@ -89,6 +89,9 @@ export class OrderModel {
         driver_type: driver.driver_type,
         plate_number: driver.plate_number,
         created_at: order.created_at,
+        ready_at: order.ready_at,
+        picked_up_at: order.picked_up_at,
+        delivered_at: order.delivered_at,
         user_name: user.user_name,
         user_phone: user.user_phone,
         user_address: user.user_address,
@@ -338,6 +341,9 @@ export class OrderModel {
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
         driver_id: order.driver_id,
+        ready_at: order.ready_at,
+        picked_up_at: order.picked_up_at,
+        delivered_at: order.delivered_at,
         created_at: order.created_at,
         user_name: user.user_name,
         user_phone: user.user_phone,
@@ -401,7 +407,7 @@ export class OrderModel {
     const offset = (page - 1) * 50;
     const limit = page * 50;
     const earnings = await db
-      .select({
+      .selectDistinct({
         delivery_cost: sql<number>`SUM(${order.order_delivery_cost})`,
         sum_of_orders_based_on_date: sql<number>`COUNT(${order.order_id})`,
         sum_of_orders: sql<number>`(SELECT COUNT(*) FROM \'order\' WHERE driver_id = ${id})`,

@@ -119,35 +119,6 @@ const getDriverById = async (req: Request, res: Response) => {
 };
 
 const addDriver = async (req: Request, res: Response) => {
-  try {
-    const { full_name, phone, city, type, id_number, plate_number } = req.body;
-
-    const { data: _, error } = await tryCatch(
-      DriverModel.create({
-        driver_full_name: full_name,
-        driver_phone: phone,
-        driver_city: city,
-        driver_type: type,
-        id_number: id_number,
-        plate_number: plate_number,
-      })
-    );
-
-    if (error) {
-      console.log(error);
-      return res.status(500).json({ message: error.message });
-    }
-
-    res.json({ success: true });
-  } catch (err: any) {
-    console.error("addDriver error:", err);
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: err.message });
-  }
-};
-
-const addFromAdmin = async (req: Request, res: Response) => {
   const allowedTextFields = [
     "driver_full_name",
     "rate",
@@ -223,6 +194,82 @@ const addFromAdmin = async (req: Request, res: Response) => {
   });
 };
 
+const addFromAdmin = async (req: Request, res: Response) => {
+  const allowedTextFields = [
+    "driver_full_name",
+    "rate",
+    "driver_status",
+    "driver_type",
+    "driver_phone",
+    "driver_city",
+    "id_number",
+    "plate_number",
+    "password",
+    "is_baned",
+    "freelancer",
+    "shift_duration",
+  ];
+
+  const textUpdates: Record<string, any> = {};
+
+  for (const field of allowedTextFields) {
+    if (field in req.body) {
+      if (field === "password") {
+        const hashedPassword = crypto
+          .createHash("sha256")
+          .update(req.body[field])
+          .digest("hex");
+        Object.assign(textUpdates, { password: hashedPassword });
+      } else {
+        textUpdates[field] = req.body[field];
+      }
+    }
+  }
+
+  const allowedFiles = [
+    "first_license_photo",
+    "second_license_photo",
+    "third_license_photo",
+    "fourth_license_photo",
+  ];
+
+  const uploadedFiles = (req.files || {}) as {
+    [key: string]: Express.Multer.File[];
+  };
+  const fileUpdates: Record<string, any> = {};
+
+  for (const field of allowedFiles) {
+    const file = uploadedFiles?.[field]?.[0];
+    if (!file) continue;
+
+    const originalPath = file.path;
+    const webpPath = originalPath.replace(path.extname(originalPath), ".webp");
+
+    await sharp(originalPath).webp({ quality: 80 }).toFile(webpPath);
+
+    fs.unlinkSync(originalPath);
+
+    fileUpdates[field] = webpPath
+      .replace(process.cwd(), "")
+      .replace("/public", "")
+      .replace(/\\/g, "/");
+  }
+
+  const allUpdates = { ...textUpdates, ...fileUpdates };
+
+  const { error } = await tryCatch(DriverModel.create(allUpdates));
+
+  if (error) {
+    console.log(error);
+    return res.status(500).json({ message: "خطأ أثناء إضافة السائق" });
+  }
+
+  res.json({
+    success: true,
+    updated_fields: allUpdates,
+  });
+};
+
 const editDriver = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const { banning } = req.query;
@@ -231,12 +278,10 @@ const editDriver = async (req: Request, res: Response) => {
     const { data: _, error } = await tryCatch(
       DriverModel.update(id, { is_baned: req.body.ban })
     );
-
     if (error) {
       console.log(error);
       return res.status(500).json({ message: "خطأ أثناء حظر السائق" });
     }
-
     return res.json({ success: true });
   }
 
@@ -251,6 +296,8 @@ const editDriver = async (req: Request, res: Response) => {
     "plate_number",
     "password",
     "is_baned",
+    "freelancer",
+    "shift_duration",
   ];
 
   const textUpdates: Record<string, any> = {};
@@ -262,7 +309,6 @@ const editDriver = async (req: Request, res: Response) => {
           .createHash("sha256")
           .update(req.body.password)
           .digest("hex");
-
         Object.assign(textUpdates, { password: hashedPassword });
       } else {
         textUpdates[field] = req.body[field];
@@ -309,13 +355,11 @@ const editDriver = async (req: Request, res: Response) => {
 
   const allUpdates = { ...textUpdates, ...fileUpdates };
 
-  if (Object.keys(allUpdates).length > 0) {
-    const { error } = await tryCatch(DriverModel.update(id, allUpdates));
+  const { error } = await tryCatch(DriverModel.update(id, allUpdates));
 
-    if (error) {
-      console.log(error);
-      return res.status(500).json({ message: "خطأ أثناء تعديل بيانات السائق" });
-    }
+  if (error) {
+    console.log(error);
+    return res.status(500).json({ message: "خطأ أثناء تعديل بيانات السائق" });
   }
 
   res.json({

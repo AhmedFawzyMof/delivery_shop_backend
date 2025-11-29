@@ -98,14 +98,14 @@ export class DriverModel {
     };
   }
 
-  static async getByIdAndPassword(id: string, password: string) {
+  static async getByPhoneAndPassword(phone: string, password: string) {
     return db
       .select()
       .from(driver)
       .where(
         and(
           and(eq(driver.is_baned, false), eq(driver.driver_status, "approved")),
-          and(eq(driver.id_number, id), eq(driver.password, password))
+          and(eq(driver.driver_phone, phone), eq(driver.password, password))
         )
       );
   }
@@ -123,7 +123,7 @@ export class DriverModel {
     const fromDateTime = today.includes(":") ? today : `${today} 00:00:00`;
     const toDateTime = today.includes(":") ? today : `${today} 23:59:59`;
     const result = await db
-      .select({
+      .selectDistinct({
         todayEarnings: sql<number>`SUM(${order.order_delivery_cost})`.as(
           "todayEarnings"
         ),

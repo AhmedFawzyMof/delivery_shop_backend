@@ -50,29 +50,46 @@ const restaurant_login = async (req: Request, res: Response) => {
 };
 
 const driver_login = async (req: Request, res: Response) => {
-  const { id_number, password, shift } = req.body;
+  const { phone, password, shift, is_freelancer } = req.body;
   const selfieFile = req.file;
 
-  if (!id_number || !password || !shift || !selfieFile) {
+  if (!phone || !password || !selfieFile) {
     console.error(req.body, req.file);
-    return res.status(422).json({ message: "Missing required fields" });
+    return res.status(422).send("Missing required fields");
+  }
+
+  if (is_freelancer && !shift) {
+    return res
+      .status(422)
+      .json("Shift duration is required for freelancer drivers");
   }
 
   const hashedPassword = hashPassword(password);
 
-  const { data: found, error } = await tryCatch(
-    DriverModel.getByIdAndPassword(id_number, hashedPassword)
+  const { data: driver, error } = await tryCatch(
+    DriverModel.getByPhoneAndPassword(phone, hashedPassword)
   );
 
-  if (error) return res.status(500).json({ message: error.message });
-  if (found.length === 0)
-    return res.status(401).json({ message: "Invalid ID or password" });
+  if (error) return res.status(500).send(error.message);
 
-  const driverId = found[0].driver_id;
+  if (driver.length === 0)
+    return res.status(401).send("Invalid ID or password");
 
+  const driverId = driver[0].driver_id;
   const selfiePath = selfieFile.path;
 
-  const shiftDuration = Number(shift);
+  let shiftDuration: number;
+
+  if (driver[0].freelancer) {
+    shiftDuration = Number(shift);
+  } else {
+    shiftDuration = Number(driver[0].shift_duration);
+
+    if (!shiftDuration) {
+      cleanupFile(selfiePath);
+      return res.status(500).send("Driver shift duration missing in database");
+    }
+  }
 
   const { error: recordError } = await handleLoginRecord(
     driverId,
@@ -87,7 +104,7 @@ const driver_login = async (req: Request, res: Response) => {
 
   const sessionToken = createSessionToken(
     {
-      ...found[0],
+      ...driver[0],
       type: "driver",
       shiftDuration,
     },
@@ -95,7 +112,7 @@ const driver_login = async (req: Request, res: Response) => {
   );
 
   res.json({
-    driver: found[0],
+    driver: driver[0],
     sessionToken,
   });
 };
@@ -137,7 +154,7 @@ const admin_login = async (req: Request, res: Response) => {
   if (error) return res.status(500).json({ message: error.message });
   if (!data) return res.status(401).json({ message: "Invalid credentials" });
 
-  const sessionToken = createSessionToken({ ...data }, "1d");
+  const sessionToken = createSessionToken({ ...data, type: "admin" }, "1d");
 
   res.status(200).json({
     user: data,
