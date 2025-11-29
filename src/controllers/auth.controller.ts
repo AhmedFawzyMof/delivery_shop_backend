@@ -58,7 +58,7 @@ const driver_login = async (req: Request, res: Response) => {
     return res.status(422).send("Missing required fields");
   }
 
-  if (is_freelancer && !shift) {
+  if (is_freelancer === "1" && !shift) {
     return res
       .status(422)
       .json("Shift duration is required for freelancer drivers");

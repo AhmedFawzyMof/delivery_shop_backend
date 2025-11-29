@@ -86,12 +86,12 @@ export const createRestaurant = async (req: Request, res: Response) => {
 
   if (location && typeof location === "string" && location.includes(",")) {
     const [latStr, lngStr] = location.split(",").map((v) => v.trim());
-    parsedLocation = {
+    parsedLocation = JSON.stringify({
       lat: parseFloat(latStr),
       lng: parseFloat(lngStr),
-    };
+    });
   } else {
-    return res.status(400).json({ message: "Invalid location format" });
+    parsedLocation = "";
   }
 
   const { data, error } = await tryCatch(
@@ -101,7 +101,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
       logo_image: imagePath,
       address,
       commercial_register,
-      location: JSON.stringify(parsedLocation),
+      location: parsedLocation,
       password: hashedPassword,
     })
   );
