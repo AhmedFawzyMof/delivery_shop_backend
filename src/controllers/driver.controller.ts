@@ -357,7 +357,12 @@ const editDriver = async (req: Request, res: Response) => {
 
   const allUpdates = { ...textUpdates, ...fileUpdates };
 
-  const { error } = await tryCatch(DriverModel.update(id, allUpdates));
+  const newData = { ...allUpdates };
+  if (allUpdates.is_baned) {
+    Object.assign(newData, { is_baned: JSON.parse(allUpdates.is_baned) });
+  }
+
+  const { error } = await tryCatch(DriverModel.update(id, newData));
 
   if (error) {
     console.log(error);
