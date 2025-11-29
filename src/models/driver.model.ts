@@ -71,6 +71,8 @@ export class DriverModel {
         second_license_photo: driver.second_license_photo,
         third_license_photo: driver.third_license_photo,
         fourth_license_photo: driver.fourth_license_photo,
+        freelancer: driver.freelancer,
+        shift_duration: driver.shift_duration,
         rate: driver.rate,
         login_record: {
           driver_image: driver_login_record.driver_image,
