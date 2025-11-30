@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { OrderModel } from "../models/order.model.js";
 import tryCatch from "../utils/trycatch.js";
-import { UserModel } from "../models/user.model.js";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";

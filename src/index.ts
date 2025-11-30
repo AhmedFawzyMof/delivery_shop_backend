@@ -161,6 +161,16 @@ wss.on("connection", (ws: ExtWebSocket) => {
         }
       }
 
+      if (data.type === "change_city" && data.driver_id && data.driver_city) {
+        const driver = driverClients.get(Number(data.driver_id));
+        if (driver) {
+          driver.driver_city = data.driver_city;
+          console.log(
+            `🌆 Driver ${data.driver_id} city updated to ${data.driver_city}`
+          );
+        }
+      }
+
       if (data.type === "get_orders" && data.driver_id) {
         const driver = driverClients.get(Number(data.driver_id));
         if (driver && driver.readyState === WebSocket.OPEN) {
