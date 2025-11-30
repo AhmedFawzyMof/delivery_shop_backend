@@ -84,8 +84,8 @@ const driver_login = async (req: Request, res: Response) => {
     shiftDuration = Number(shift);
   } else {
     shiftDuration = driver[0].shift_duration!;
-
     if (!shiftDuration) {
+      console.log("Driver shift duration missing in database");
       cleanupFile(selfiePath);
       return res.status(500).send("Driver shift duration missing in database");
     }
