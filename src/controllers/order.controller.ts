@@ -178,7 +178,7 @@ export const createOrder = async (req: Request, res: Response) => {
 
       console.log("step 2");
 
-      if (order.order_city) {
+      if (!order.order_city) {
         return;
       }
 
