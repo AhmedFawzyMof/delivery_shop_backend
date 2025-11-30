@@ -80,6 +80,7 @@ const driver_login = async (req: Request, res: Response) => {
 
   let shiftDuration: number;
 
+  console.log(driver[0]);
   if (driver[0].freelancer) {
     shiftDuration = Number(shift);
   } else {
