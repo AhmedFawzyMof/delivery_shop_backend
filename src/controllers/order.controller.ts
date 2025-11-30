@@ -97,104 +97,118 @@ export const getOrderById = async (req: Request, res: Response) => {
 export const createOrder = async (req: Request, res: Response) => {
   const restaurant = (req as any).user;
 
-  try {
-    let imageUrl = "";
+  let imageUrl = "";
 
-    // ---------------- HANDLE IMAGE ----------------
-    if (req.body.receiptImage) {
-      const base64Data = req.body.receiptImage.split(";base64,").pop();
-      const imageBuffer = Buffer.from(base64Data, "base64");
-      const finalDir = "public/images/receipt";
+  // ---------------- HANDLE IMAGE ----------------
+  if (req.body.receiptImage) {
+    const base64Data = req.body.receiptImage.split(";base64,").pop();
+    const imageBuffer = Buffer.from(base64Data, "base64");
+    const finalDir = "public/images/receipt";
 
-      if (!fs.existsSync(finalDir)) {
-        fs.mkdirSync(finalDir, { recursive: true });
-      }
-
-      const fileName = `${uuidv4()}.png`;
-      const filePath = path.join(finalDir, fileName);
-      fs.writeFileSync(filePath, imageBuffer);
-
-      const webpFileName = await convertToWebp(filePath, finalDir);
-      imageUrl = `/images/receipt/${webpFileName}`;
-    } else if (req.file) {
-      const finalDir = "public/images/receipt";
-
-      if (!fs.existsSync(finalDir)) {
-        fs.mkdirSync(finalDir, { recursive: true });
-      }
-
-      const webpFileName = await convertToWebp(req.file.path, finalDir);
-      imageUrl = `/images/receipt/${webpFileName}`;
+    if (!fs.existsSync(finalDir)) {
+      fs.mkdirSync(finalDir, { recursive: true });
     }
 
-    const { data: order_data, error: order_error } = await tryCatch(
-      OrderModel.create({
-        order_total_price: Number(req.body.totalAmount),
-        order_delivery_cost: Number(req.body.deliveryCost),
-        order_status: "preparing",
-        order_notes: req.body.notes,
-        restaurant_id: restaurant.id,
-        order_city: req.body.order_city,
-        order_receipt: imageUrl,
-      })
-    );
+    const fileName = `${uuidv4()}.png`;
+    const filePath = path.join(finalDir, fileName);
+    fs.writeFileSync(filePath, imageBuffer);
 
-    if (order_error) {
-      return res.status(500).json({ message: order_error.message });
+    const webpFileName = await convertToWebp(filePath, finalDir);
+    imageUrl = `/images/receipt/${webpFileName}`;
+  } else if (req.file) {
+    const finalDir = "public/images/receipt";
+
+    if (!fs.existsSync(finalDir)) {
+      fs.mkdirSync(finalDir, { recursive: true });
     }
 
-    if (!order_data || order_data.length === 0) {
-      return res.status(500).json({ message: "Failed to create order" });
-    }
+    const webpFileName = await convertToWebp(req.file.path, finalDir);
+    imageUrl = `/images/receipt/${webpFileName}`;
+  }
 
-    const order = order_data[0];
+  const { data: order_data, error: order_error } = await tryCatch(
+    OrderModel.create({
+      order_total_price: Number(req.body.totalAmount),
+      order_delivery_cost: Number(req.body.deliveryCost),
+      order_status: "preparing",
+      order_notes: req.body.notes,
+      restaurant_id: restaurant.id,
+      order_city: req.body.order_city,
+      order_receipt: imageUrl,
+    })
+  );
 
-    broadcastToRestaurant(restaurant.id, {
-      type: "new_order",
-      order,
-    });
+  if (order_error) {
+    return res.status(500).json({ message: order_error.message });
+  }
 
-    res.json({ success: true });
+  if (!order_data || order_data.length === 0) {
+    return res.status(500).json({ message: "Failed to create order" });
+  }
 
-    setImmediate(async () => {
-      try {
-        let location = restaurant.location;
+  const order = order_data[0];
 
-        if (typeof location === "string") {
+  broadcastToRestaurant(restaurant.id, {
+    type: "new_order",
+    order,
+  });
+
+  res.json({ success: true });
+
+  setImmediate(async () => {
+    try {
+      let location = restaurant.location;
+      if (typeof location === "string") {
+        try {
           const cleaned = location.replaceAll("\\", "").replace(/^"|"$/g, "");
           location = JSON.parse(cleaned);
+        } catch (err2) {
+          console.error("❌ Invalid location JSON after cleanup:", err2);
+          location = null;
         }
-
-        if (!location) return;
-        if (order.order_city) return;
-
-        const drivers = await searchForDrivers(
-          restaurant.id,
-          order.order_city || "",
-          location.lat,
-          location.lng,
-          driverClients
-        );
-
-        if (drivers.length === 0) return;
-
-        const ws = driverClients.get(drivers[0].driver_id!);
-        if (ws && ws.readyState === ws.OPEN) {
-          ws.send(
-            JSON.stringify({
-              type: "new_order_nearby",
-              order: { ...order, restaurant },
-            })
-          );
-        }
-      } catch (err) {
-        console.error("Background driver search error:", err);
       }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+
+      if (!location) {
+        console.error(
+          "❌ Restaurant location invalid — cannot search for drivers."
+        );
+        return;
+      }
+
+      if (order_data[0].order_city) {
+        return;
+      }
+
+      const drivers = await searchForDrivers(
+        restaurant.id,
+        order_data[0].order_city ? order_data[0].order_city : "",
+        location.lat,
+        location.lng,
+        driverClients
+      );
+
+      if (drivers.length === 0) {
+        console.error("❌ No drivers found.");
+        return;
+      }
+
+      const ws = driverClients.get(drivers[0].driver_id!);
+      if (ws && ws.readyState === ws.OPEN) {
+        ws.send(
+          JSON.stringify({
+            type: "new_order_nearby",
+            order: { ...order_data[0], restaurant },
+          })
+        );
+      }
+
+      console.log(
+        `📢 Broadcasted order ${order_data[0].order_id} to ${drivers.length} drivers.`
+      );
+    } catch (err) {
+      console.error("❌ Background driver search failed:", err);
+    }
+  });
 };
 
 export const updateOrder = async (req: Request, res: Response) => {
