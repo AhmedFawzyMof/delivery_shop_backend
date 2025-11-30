@@ -157,9 +157,7 @@ export const createOrder = async (req: Request, res: Response) => {
   setImmediate(async () => {
     try {
       let location = restaurant.location;
-      console.log("step 1");
       if (typeof location === "string") {
-        console.log("step 1.5");
         try {
           const cleaned = location.replaceAll("\\", "").replace(/^"|"$/g, "");
           location = JSON.parse(cleaned);
@@ -176,13 +174,9 @@ export const createOrder = async (req: Request, res: Response) => {
         return;
       }
 
-      console.log("step 2");
-
       if (!order.order_city) {
         return;
       }
-
-      console.log("step 3");
 
       const drivers = await searchForDrivers(
         restaurant.id,
@@ -192,14 +186,10 @@ export const createOrder = async (req: Request, res: Response) => {
         driverClients
       );
 
-      console.log("step 4");
-
       if (drivers.length === 0) {
         console.error("❌ No drivers found.");
         return;
       }
-
-      console.log("step 5");
 
       const ws = driverClients.get(drivers[0].driver_id!);
       if (ws && ws.readyState === ws.OPEN) {
