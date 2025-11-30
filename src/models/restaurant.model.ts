@@ -6,6 +6,7 @@ export class RestaurantModel {
   static async create(data: {
     restaurant_name: string;
     restaurant_city: string;
+    phone: string;
     logo_image?: string;
     address?: string;
     location?: string;

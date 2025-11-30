@@ -5,6 +5,7 @@ export const restaurant = sqliteTable("restaurant", {
   restaurant_id: integer("restaurant_id").primaryKey({ autoIncrement: true }),
   restaurant_name: text("restaurant_name"),
   restaurant_city: text("restaurant_city"),
+  phone: text("phone"),
   logo_image: text("logo_image"),
   address: text("address"),
   location: text("location"),

@@ -47,6 +47,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
     restaurant_name,
     restaurant_city,
     address,
+    phone,
     commercial_register,
     password,
     location,
@@ -98,6 +99,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
     RestaurantModel.create({
       restaurant_name,
       restaurant_city: restaurant_city,
+      phone: phone,
       logo_image: imagePath,
       address,
       commercial_register,
