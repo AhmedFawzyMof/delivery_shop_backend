@@ -361,6 +361,9 @@ const editDriver = async (req: Request, res: Response) => {
   if (allUpdates.is_baned) {
     Object.assign(newData, { is_baned: JSON.parse(allUpdates.is_baned) });
   }
+  if (allUpdates.freelancer) {
+    Object.assign(newData, { freelancer: JSON.parse(allUpdates.freelancer) });
+  }
 
   const { error } = await tryCatch(DriverModel.update(id, newData));
 

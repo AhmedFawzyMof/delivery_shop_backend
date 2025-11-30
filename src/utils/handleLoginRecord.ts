@@ -30,7 +30,6 @@ export const handleLoginRecord = async (
 
     const publicPath = finalPath.replace("public/", "");
 
-    console.log(shiftDuration);
     const loginRecordData = {
       driver_image: publicPath,
       login_time: new Date().toISOString(),
