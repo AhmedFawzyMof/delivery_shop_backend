@@ -83,7 +83,7 @@ const driver_login = async (req: Request, res: Response) => {
   if (driver[0].freelancer) {
     shiftDuration = Number(shift);
   } else {
-    shiftDuration = Number(driver[0].shift_duration);
+    shiftDuration = driver[0].shift_duration!;
 
     if (!shiftDuration) {
       cleanupFile(selfiePath);
