@@ -17,6 +17,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
   const from_date = req.query.from
     ? new Date(req.query.from as string).toISOString().split("T")[0]
     : undefined;
+
   const to_date = req.query.to
     ? new Date(req.query.to as string).toISOString().split("T")[0]
     : undefined;
@@ -35,7 +36,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
     );
 
     if (error) {
-      res.status(500).json({ message: error.message });
+      return res.status(500).json({ message: error.message });
     }
 
     return res.json({ stats: data });
@@ -46,10 +47,10 @@ export const getAllOrders = async (req: Request, res: Response) => {
   );
 
   if (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 
-  res.json({ orders: data });
+  return res.json({ orders: data });
 };
 
 export const getAllOrdersAdmin = async (req: Request, res: Response) => {
