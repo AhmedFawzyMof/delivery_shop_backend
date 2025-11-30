@@ -55,6 +55,7 @@ export default async function searchForDrivers(
     intervalMs = 5000,
   } = {}
 ): Promise<ExtWebSocket[]> {
+  console.log(order_city);
   const stationedDrivers = Array.from(drivers.values()).filter(
     (ws) =>
       ws.driver_stationed_at === restaurant_id &&

@@ -148,7 +148,6 @@ export const createOrder = async (req: Request, res: Response) => {
   }
 
   const order = order_data[0];
-  console.log(order);
   broadcastToRestaurant(restaurant.id, {
     type: "new_order",
     order,
@@ -176,13 +175,13 @@ export const createOrder = async (req: Request, res: Response) => {
         return;
       }
 
-      if (order_data[0].order_city) {
+      if (order.order_city) {
         return;
       }
 
       const drivers = await searchForDrivers(
         restaurant.id,
-        order_data[0].order_city ? order_data[0].order_city : "",
+        order.order_city || "",
         location.lat,
         location.lng,
         driverClients
