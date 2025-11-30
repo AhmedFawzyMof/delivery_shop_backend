@@ -154,7 +154,7 @@ export const createOrder = async (req: Request, res: Response) => {
   });
 
   res.json({ success: true });
-
+  console.log("searching...");
   setImmediate(async () => {
     try {
       let location = restaurant.location;
