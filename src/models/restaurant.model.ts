@@ -47,7 +47,7 @@ export class RestaurantModel {
       .get();
 
     const result = await db
-      .select({
+      .selectDistinct({
         restaurant_id: restaurant.restaurant_id,
         restaurant_name: restaurant.restaurant_name,
         restaurant_city: restaurant.restaurant_city,
