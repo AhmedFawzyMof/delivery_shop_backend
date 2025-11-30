@@ -99,6 +99,7 @@ const driver_login = async (req: Request, res: Response) => {
 
   if (recordError) {
     cleanupFile(selfiePath);
+    console.log(recordError);
     return res.status(500).json({ message: recordError.message });
   }
 
