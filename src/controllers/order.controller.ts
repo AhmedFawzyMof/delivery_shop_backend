@@ -99,7 +99,6 @@ export const createOrder = async (req: Request, res: Response) => {
 
   let imageUrl = "";
 
-  // ---------------- HANDLE IMAGE ----------------
   if (req.body.receiptImage) {
     const base64Data = req.body.receiptImage.split(";base64,").pop();
     const imageBuffer = Buffer.from(base64Data, "base64");
@@ -139,15 +138,17 @@ export const createOrder = async (req: Request, res: Response) => {
   );
 
   if (order_error) {
+    console.log(order_error);
     return res.status(500).json({ message: order_error.message });
   }
 
   if (!order_data || order_data.length === 0) {
+    console.log("Failed to create order");
     return res.status(500).json({ message: "Failed to create order" });
   }
 
   const order = order_data[0];
-
+  console.log(order);
   broadcastToRestaurant(restaurant.id, {
     type: "new_order",
     order,
