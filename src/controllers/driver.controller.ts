@@ -179,14 +179,12 @@ const addDriver = async (req: Request, res: Response) => {
   }
 
   const allUpdates = { ...textUpdates, ...fileUpdates };
+  console.log(allUpdates);
+  const { error } = await tryCatch(DriverModel.create(allUpdates));
 
-  if (Object.keys(allUpdates).length > 0) {
-    const { error } = await tryCatch(DriverModel.create(allUpdates));
-
-    if (error) {
-      console.log(error);
-      return res.status(500).json({ message: "خطأ أثناء تعديل بيانات السائق" });
-    }
+  if (error) {
+    console.log(error);
+    return res.status(500).json({ message: "خطأ أثناء إضافة السائق" });
   }
 
   res.json({

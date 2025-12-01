@@ -15,11 +15,9 @@ import {
 import { authMiddleware } from "../middleware/auth";
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Generate driverId automatically (timestamp-based)
     const driverId = Date.now().toString();
 
-    // Store generated ID on req, so you can use it later in the route
-    req.generatedDriverId = driverId;
+    req.body.driver_id = driverId;
 
     const uploadPath = path.join(
       process.cwd(),
