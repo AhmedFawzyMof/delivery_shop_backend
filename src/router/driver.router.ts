@@ -13,12 +13,13 @@ import {
   addFromAdmin,
 } from "../controllers/driver.controller";
 import { authMiddleware } from "../middleware/auth";
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let driverId = req.body.driver_id;
+    // Generate driverId automatically (timestamp-based)
+    const driverId = Date.now().toString();
 
-    if (req.method === "PUT") driverId = req.params.id;
+    // Store generated ID on req, so you can use it later in the route
+    req.generatedDriverId = driverId;
 
     const uploadPath = path.join(
       process.cwd(),
@@ -45,6 +46,7 @@ const storage = multer.diskStorage({
     cb(null, unique);
   },
 });
+
 const upload = multer({ storage });
 
 const router = express.Router();
