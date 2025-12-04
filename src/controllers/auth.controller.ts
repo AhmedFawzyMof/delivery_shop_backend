@@ -80,7 +80,6 @@ const driver_login = async (req: Request, res: Response) => {
 
   let shiftDuration: number;
 
-  console.log(driver[0]);
   if (driver[0].freelancer) {
     shiftDuration = Number(shift);
   } else {
@@ -119,24 +118,6 @@ const driver_login = async (req: Request, res: Response) => {
   });
 };
 
-const verify_session = async (req: Request, res: Response) => {
-  try {
-    const header = req.headers.authorization;
-    if (!header) return res.status(401).json({ message: "Not authenticated" });
-
-    const token = header.split(" ")[1];
-    if (!token) return res.status(401).json({ message: "Missing token" });
-
-    const decoded = verifySessionToken(token);
-    if (!decoded)
-      return res.status(401).json({ message: "Invalid or expired session" });
-
-    res.json({ user: decoded });
-  } catch (e) {
-    return res.status(500).json({ message: (e as Error).message });
-  }
-};
-
 const admin_login = async (req: Request, res: Response) => {
   const { identifier, password } = req.body;
 
@@ -162,6 +143,24 @@ const admin_login = async (req: Request, res: Response) => {
     user: data,
     sessionToken,
   });
+};
+
+const verify_session = async (req: Request, res: Response) => {
+  try {
+    const header = req.headers.authorization;
+    if (!header) return res.status(401).json({ message: "Not authenticated" });
+
+    const token = header.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Missing token" });
+
+    const decoded = verifySessionToken(token);
+    if (!decoded)
+      return res.status(401).json({ message: "Invalid or expired session" });
+
+    res.json({ user: decoded });
+  } catch (e) {
+    return res.status(500).json({ message: (e as Error).message });
+  }
 };
 
 export { restaurant_login, verify_session, driver_login, admin_login };

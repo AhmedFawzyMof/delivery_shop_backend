@@ -8,6 +8,7 @@ import { convertToWebp } from "../utils/imageconverter.js";
 import { broadcastToRestaurant, driverClients } from "../index.js";
 import searchForDrivers from "../utils/geoFunctions.js";
 import { CitiesModel } from "../models/cities.model.js";
+import { OrderQueuesModel } from "../models/order_queue.model.js";
 
 export const getAllOrders = async (req: Request, res: Response) => {
   const status = req.query.status;
@@ -129,6 +130,7 @@ export const createOrder = async (req: Request, res: Response) => {
     OrderModel.create({
       order_total_price: Number(req.body.totalAmount),
       order_delivery_cost: Number(req.body.deliveryCost),
+      user_phone: req.body.customerPhone,
       order_status: "preparing",
       order_notes: req.body.notes,
       restaurant_id: restaurant.id,
@@ -148,66 +150,34 @@ export const createOrder = async (req: Request, res: Response) => {
   }
 
   const order = order_data[0];
+
+  const { data: _, error: queue_error } = await tryCatch(
+    OrderQueuesModel.create({
+      order_id: order.order_id,
+      payload: JSON.stringify({
+        order_id: order.order_id,
+        restaurant_id: restaurant.id,
+      }),
+      status: "pending",
+      attempts: 0,
+      created_at: Date.now(),
+      updated_at: Date.now(),
+    })
+  );
+
+  if (queue_error) {
+    console.log("Failed to create queue for the order");
+    return res
+      .status(500)
+      .json({ message: "Failed to create queue for the order" });
+  }
+
   broadcastToRestaurant(restaurant.id, {
     type: "new_order",
     order,
   });
 
   res.json({ success: true });
-  setImmediate(async () => {
-    try {
-      let location = restaurant.location;
-      if (typeof location === "string") {
-        try {
-          const cleaned = location.replaceAll("\\", "").replace(/^"|"$/g, "");
-          location = JSON.parse(cleaned);
-        } catch (err2) {
-          console.error("❌ Invalid location JSON after cleanup:", err2);
-          location = null;
-        }
-      }
-
-      if (!location) {
-        console.error(
-          "❌ Restaurant location invalid — cannot search for drivers."
-        );
-        return;
-      }
-
-      if (!order.order_city) {
-        return;
-      }
-
-      const drivers = await searchForDrivers(
-        restaurant.id,
-        order.order_city || "",
-        location.lat,
-        location.lng,
-        driverClients
-      );
-
-      if (drivers.length === 0) {
-        console.error("❌ No drivers found.");
-        return;
-      }
-
-      const ws = driverClients.get(drivers[0].driver_id!);
-      if (ws && ws.readyState === ws.OPEN) {
-        ws.send(
-          JSON.stringify({
-            type: "new_order_nearby",
-            order: { ...order_data[0], restaurant },
-          })
-        );
-      }
-
-      console.log(
-        `📢 Broadcasted order ${order_data[0].order_id} to ${drivers.length} drivers.`
-      );
-    } catch (err) {
-      console.error("❌ Background driver search failed:", err);
-    }
-  });
 };
 
 export const updateOrder = async (req: Request, res: Response) => {

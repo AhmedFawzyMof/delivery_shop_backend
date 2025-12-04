@@ -1,12 +1,5 @@
-import { Console } from "console";
 import { db } from "../config/db/index.js";
-import {
-  cities,
-  driver,
-  order,
-  restaurant,
-  user,
-} from "../config/db/schema.js";
+import { cities, driver, order, restaurant } from "../config/db/schema.js";
 import { eq, sql, and, desc, not } from "drizzle-orm";
 
 export class OrderModel {
@@ -82,6 +75,7 @@ export class OrderModel {
         order_receipt: order.order_receipt,
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
+        user_phone: order.user_phone,
         driver_id: order.driver_id,
         driver_full_name: driver.driver_full_name,
         driver_phone: driver.driver_phone,
@@ -182,6 +176,7 @@ export class OrderModel {
         order_receipt: order.order_receipt,
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
+        user_phone: order.user_phone,
         driver_id: order.driver_id,
         created_at: order.created_at,
         restaurant_name: restaurant.restaurant_name,
@@ -319,6 +314,7 @@ export class OrderModel {
         order_receipt: order.order_receipt,
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
+        user_phone: order.user_phone,
         driver_id: order.driver_id,
         ready_at: order.ready_at,
         picked_up_at: order.picked_up_at,
@@ -351,6 +347,11 @@ export class OrderModel {
         order_total_price: order.order_total_price,
         order_delivery_cost: order.order_delivery_cost,
         order_city: order.order_city,
+        user_phone: order.user_phone,
+        created_at: order.created_at,
+        ready_at: order.ready_at,
+        picked_up_at: order.picked_up_at,
+        delivered_at: order.delivered_at,
         restaurant: {
           restaurant_id: restaurant.restaurant_id,
           restaurant_name: restaurant.restaurant_name,
@@ -393,6 +394,7 @@ export class OrderModel {
         )
       )
       .get();
+
     const orders = await db
       .selectDistinct({
         order_id: order.order_id,
@@ -404,7 +406,7 @@ export class OrderModel {
         restaurant_address: restaurant.address,
       })
       .from(order)
-      .innerJoin(restaurant, eq(order.restaurant_id, user.restaurant_id))
+      .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
       .where(
         and(
           eq(order.driver_id, id),

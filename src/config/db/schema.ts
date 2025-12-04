@@ -53,19 +53,6 @@ export const driver_login_record = sqliteTable("driver_login_record", {
   shift_end_time: text("shift_end_time"),
 });
 
-export const user = sqliteTable("user", {
-  user_id: integer("user_id").primaryKey({ autoIncrement: true }),
-  user_name: text("user_name"),
-  user_phone: text("user_phone"),
-  user_address: text("user_address"),
-  restaurant_id: integer("restaurant_id").references(
-    () => restaurant.restaurant_id,
-    {
-      onDelete: "cascade",
-    }
-  ),
-});
-
 export const order = sqliteTable("order", {
   order_id: integer("order_id").primaryKey({ autoIncrement: true }),
   order_total_price: integer("order_total_price"),
@@ -75,6 +62,7 @@ export const order = sqliteTable("order", {
   order_city: text("order_city"),
   pickup_image: text("pickup_image"),
   order_notes: text("order_notes"),
+  user_phone: text("user_phone"),
   driver_id: integer("driver_id").references(() => driver.driver_id),
   restaurant_id: integer("restaurant_id").references(
     () => restaurant.restaurant_id
@@ -133,4 +121,15 @@ export const contact = sqliteTable("contact", {
   contact_phone: text("contact_phone"),
   contact_message: text("contact_message"),
   created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const orderQueues = sqliteTable("order_queues", {
+  queue_id: integer("queue_id").primaryKey({ autoIncrement: true }),
+  order_id: integer("order_id").notNull(),
+  status: text("status", { length: 20 }).notNull().default("pending"),
+  payload: text("payload").notNull(),
+  locked_at: integer("locked_at"),
+  attempts: integer("attempts").notNull().default(0),
+  created_at: integer("created_at").notNull().default(Date.now()),
+  updated_at: integer("updated_at").notNull().default(Date.now()),
 });

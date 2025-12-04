@@ -73,7 +73,7 @@ const getAllDrivers = async (req: Request, res: Response) => {
 };
 
 const getDriverById = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
+  const id = parseInt(req.params.id);
   const { history } = req.query;
   const page = req.query.page ? Number(req.query.page) : 1;
 
