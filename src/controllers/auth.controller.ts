@@ -24,7 +24,7 @@ const restaurant_login = async (req: Request, res: Response) => {
     .digest("hex");
 
   const { data, error } = await tryCatch(
-    RestaurantModel.getByNameAndPassword(restaurant_name, hashedPassword)
+    RestaurantModel.getByNameAndPassword(restaurant_name, hashedPassword),
   );
 
   if (error) return res.status(500).json({ message: error.message });
@@ -50,12 +50,12 @@ const restaurant_login = async (req: Request, res: Response) => {
 };
 
 const driver_login = async (req: Request, res: Response) => {
-  const { phone, password, shift, is_freelancer } = req.body;
+  const { phone, password, shift, is_freelancer, device_id } = req.body;
   const selfieFile = req.file;
 
-  if (!phone || !password || !selfieFile) {
+  if (!phone || !password || !selfieFile || !device_id) {
     console.error(req.body, req.file);
-    return res.status(422).send("Missing required fields");
+    return res.status(422).send("Missing required fields including device_id");
   }
 
   if (is_freelancer === "1" && !shift) {
@@ -67,23 +67,37 @@ const driver_login = async (req: Request, res: Response) => {
   const hashedPassword = hashPassword(password);
 
   const { data: driver, error } = await tryCatch(
-    DriverModel.getByPhoneAndPassword(phone, hashedPassword)
+    DriverModel.getByPhoneAndPassword(phone, hashedPassword),
   );
 
   if (error) return res.status(500).send(error.message);
-
   if (driver.length === 0)
     return res.status(401).send("Invalid ID or password");
 
-  const driverId = driver[0].driver_id;
-  const selfiePath = selfieFile.path;
+  const driverRecord = driver[0];
 
+  if (driverRecord.device_id) {
+    if (driverRecord.device_id !== device_id) {
+      return res.status(403).json({
+        message: "This driver is already logged in on another device",
+      });
+    }
+  } else {
+    const { error: updateError } = await tryCatch(
+      DriverModel.update(driverRecord.driver_id, { device_id: device_id }),
+    );
+    if (updateError) {
+      return res.status(500).json({ message: updateError.message });
+    }
+  }
+
+  const selfiePath = selfieFile.path;
   let shiftDuration: number;
 
-  if (driver[0].freelancer) {
+  if (driverRecord.freelancer) {
     shiftDuration = Number(shift);
   } else {
-    shiftDuration = driver[0].shift_duration!;
+    shiftDuration = driverRecord.shift_duration!;
     if (!shiftDuration) {
       console.log("Driver shift duration missing in database");
       cleanupFile(selfiePath);
@@ -92,9 +106,9 @@ const driver_login = async (req: Request, res: Response) => {
   }
 
   const { error: recordError } = await handleLoginRecord(
-    driverId,
+    driverRecord.driver_id,
     selfiePath,
-    shiftDuration
+    shiftDuration,
   );
 
   if (recordError) {
@@ -104,16 +118,12 @@ const driver_login = async (req: Request, res: Response) => {
   }
 
   const sessionToken = createSessionToken(
-    {
-      ...driver[0],
-      type: "driver",
-      shiftDuration,
-    },
-    `${shiftDuration}h` as TokenDuration
+    { ...driverRecord, type: "driver", shiftDuration },
+    `${shiftDuration}h` as TokenDuration,
   );
 
   res.json({
-    driver: driver[0],
+    driver: driverRecord,
     sessionToken,
   });
 };
@@ -131,7 +141,7 @@ const admin_login = async (req: Request, res: Response) => {
     .digest("hex");
 
   const { data, error } = await tryCatch(
-    AdminModel.login(identifier, hashedPassword)
+    AdminModel.login(identifier, hashedPassword),
   );
 
   if (error) return res.status(500).json({ message: error.message });

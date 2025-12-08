@@ -6,6 +6,7 @@ import {
   restaurantClients,
 } from "../..";
 import { OrderModel } from "../../models/order.model";
+import { BranchesModel } from "../../models/branches.model";
 
 type SenderType = "restaurant" | "driver" | "admin";
 
@@ -25,32 +26,24 @@ export function getSenderType(jsonData: any): SenderType {
   return "driver";
 }
 
-export function onMessageHandler(ws: ExtWebSocket, message: WebSocket.RawData) {
+export async function onMessageHandler(
+  ws: ExtWebSocket,
+  message: WebSocket.RawData
+) {
   const messageData = JSON.parse(message.toString());
   const senderType = getSenderType(messageData);
 
   if (senderType === "admin") {
     if (messageData.type === "admin_init") {
-      ws.admin_id = messageData.admin_id;
       ws.branch_id = messageData.branch_id;
-
-      if (
-        !adminClients.has({
-          admin_id: messageData.admin_id,
-          branch_id: messageData.branch_id,
-        })
-      ) {
-        adminClients.set(
-          {
-            admin_id: messageData.admin_id,
-            branch_id: messageData.branch_id,
-          },
-          ws
-        );
+      ws.admin_id = messageData.admin_id;
+      if (!adminClients.has(messageData.branch_id)) {
+        adminClients.set(messageData.branch_id, new Set());
       }
-      console.log(
-        `🛠️ Admin ${ws.admin_id} connected from branch ${ws.branch_id}`
-      );
+
+      const clients = adminClients.get(messageData.branch_id)!;
+      clients.add(ws);
+      console.log(`🛠️ Admin connected from branch ${ws.branch_id}`);
     }
     if (messageData.type === "get_driver_location" && messageData.driver_id) {
       const driver = driverClients.get(Number(messageData.driver_id));
@@ -92,6 +85,34 @@ export function onMessageHandler(ws: ExtWebSocket, message: WebSocket.RawData) {
         restaurantClients.set(id, ws);
         console.log(`Restaurant ${id} connected`);
       }
+    }
+
+    if (messageData.type === "late_preparing_order") {
+      const data = await BranchesModel.getBracheByOrderId(messageData.order_id);
+      const clients = adminClients.get(data?.branch_id!);
+      clients?.forEach((client) => {
+        client.send(
+          JSON.stringify({
+            type: "late_preparing_order",
+            restaurant: data?.restaurant_name,
+            order_id: messageData.order_id,
+          })
+        );
+      });
+    }
+
+    if (messageData.type === "late_pickup_order") {
+      const data = await BranchesModel.getBracheByOrderId(messageData.order_id);
+      const clients = adminClients.get(data?.branch_id!);
+      clients?.forEach((client) => {
+        client.send(
+          JSON.stringify({
+            type: "late_preparing_order",
+            restaurant: data?.restaurant_name,
+            order_id: messageData.order_id,
+          })
+        );
+      });
     }
   }
 

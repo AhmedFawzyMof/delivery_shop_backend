@@ -6,29 +6,34 @@ import {
 } from "../..";
 
 export function onErrorHandler(ws: ExtWebSocket) {
-  driverClients.forEach((wsConnection, key, map) => {
+  driverClients.forEach((wsConnection, driver_id, map) => {
     if (
       wsConnection.readyState === wsConnection.CLOSED ||
       wsConnection.readyState === wsConnection.CLOSING
     ) {
-      map.delete(key);
+      map.delete(driver_id);
     }
   });
 
-  adminClients.forEach((wsConnection, key, map) => {
-    if (
-      wsConnection.readyState === wsConnection.CLOSED ||
-      wsConnection.readyState === wsConnection.CLOSING
-    ) {
-      map.delete(key);
+  adminClients.forEach((clientsSet, branch_id, map) => {
+    clientsSet.forEach((wsConnection) => {
+      if (
+        wsConnection.readyState === wsConnection.CLOSED ||
+        wsConnection.readyState === wsConnection.CLOSING
+      ) {
+        clientsSet.delete(wsConnection);
+      }
+    });
+    if (clientsSet.size === 0) {
+      map.delete(branch_id);
     }
   });
-  restaurantClients.forEach((wsConnection, key, map) => {
+  restaurantClients.forEach((wsConnection, restaurant_id, map) => {
     if (
       wsConnection.readyState === wsConnection.CLOSED ||
       wsConnection.readyState === wsConnection.CLOSING
     ) {
-      map.delete(key);
+      map.delete(restaurant_id);
     }
   });
 }

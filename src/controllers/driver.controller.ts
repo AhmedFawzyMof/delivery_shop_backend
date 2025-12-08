@@ -127,6 +127,7 @@ const addDriver = async (req: Request, res: Response) => {
     "driver_phone",
     "driver_city",
     "id_number",
+    "device_id",
     "plate_number",
     "stationed_at",
     "password",
@@ -154,6 +155,9 @@ const addDriver = async (req: Request, res: Response) => {
     "second_license_photo",
     "third_license_photo",
     "fourth_license_photo",
+    "fifth_license_photo",
+    "sixth_license_photo",
+    "seventh_license_photo",
   ];
 
   const uploadedFiles = (req.files || {}) as {
@@ -202,6 +206,7 @@ const addFromAdmin = async (req: Request, res: Response) => {
     "driver_phone",
     "driver_city",
     "id_number",
+    "device_id",
     "plate_number",
     "password",
     "is_baned",
@@ -230,6 +235,9 @@ const addFromAdmin = async (req: Request, res: Response) => {
     "second_license_photo",
     "third_license_photo",
     "fourth_license_photo",
+    "fifth_license_photo",
+    "sixth_license_photo",
+    "seventh_license_photo",
   ];
 
   const uploadedFiles = (req.files || {}) as {
@@ -292,6 +300,7 @@ const editDriver = async (req: Request, res: Response) => {
     "driver_phone",
     "driver_city",
     "id_number",
+    "device_id",
     "plate_number",
     "stationed_at",
     "password",
@@ -321,6 +330,9 @@ const editDriver = async (req: Request, res: Response) => {
     "second_license_photo",
     "third_license_photo",
     "fourth_license_photo",
+    "fifth_license_photo",
+    "sixth_license_photo",
+    "seventh_license_photo",
   ];
 
   const uploadedFiles = (req.files || {}) as {

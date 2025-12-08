@@ -27,7 +27,7 @@ app.use(
   cors({
     origin: "*",
     optionsSuccessStatus: 200,
-  })
+  }),
 );
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -72,17 +72,14 @@ interface ExtWebSocket extends WebSocket {
   restaurant_id?: number;
   restaurant_location?: { lat: number; lng: number };
   driver_orders?: number[];
-  admin_id?: number;
   branch_id?: number;
+  admin_id?: number;
 }
 
 const wss = new WebSocketServer({ server });
 const restaurantClients = new Map<number, ExtWebSocket>();
 const driverClients = new Map<number, ExtWebSocket>();
-const adminClients = new Map<
-  { admin_id: number; branch_id: number },
-  ExtWebSocket
->();
+const adminClients = new Map<number, Set<ExtWebSocket>>();
 
 wss.on("connection", (ws: ExtWebSocket) => {
   console.log("🔗 WebSocket connected");
@@ -99,7 +96,8 @@ wss.on("connection", (ws: ExtWebSocket) => {
     onCloseHandler(ws);
   });
 
-  ws.on("error", () => {
+  ws.on("error", (error) => {
+    console.error(error.message);
     onErrorHandler(ws);
   });
 });

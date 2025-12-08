@@ -1,9 +1,16 @@
 import { db } from "../config/db";
-import { order, orderQueues, restaurant } from "../config/db/schema";
+import {
+  branches,
+  cities,
+  order,
+  orderQueues,
+  restaurant,
+} from "../config/db/schema";
 import { eq, and, isNull, not, sql, asc } from "drizzle-orm";
 import tryCatch from "../utils/trycatch";
 import searchForDrivers from "../utils/geoFunctions";
-import { driverClients } from "..";
+import { adminClients, driverClients, restaurantClients } from "..";
+import { type } from "os";
 
 type RestaurantLocation = {
   lat: number;
@@ -23,15 +30,15 @@ async function fetchNextJob() {
       and(
         eq(orderQueues.status, "processing"),
         not(isNull(orderQueues.locked_at)),
-        sql`${orderQueues.locked_at} < ${Date.now() - LOCK_TIMEOUT}`
-      )
+        sql`${orderQueues.locked_at} < ${Date.now() - LOCK_TIMEOUT}`,
+      ),
     );
 
   const job = await db
     .select()
     .from(orderQueues)
     .where(
-      and(eq(orderQueues.status, "pending"), isNull(orderQueues.locked_at))
+      and(eq(orderQueues.status, "pending"), isNull(orderQueues.locked_at)),
     )
     .orderBy(asc(orderQueues.created_at))
     .limit(1);
@@ -70,6 +77,7 @@ async function handleOrder(job: any) {
         ready_at: order.ready_at,
         picked_up_at: order.picked_up_at,
         delivered_at: order.delivered_at,
+        branche_id: branches.branch_id,
         restaurant: {
           restaurant_id: restaurant.restaurant_id,
           restaurant_name: restaurant.restaurant_name,
@@ -79,8 +87,10 @@ async function handleOrder(job: any) {
       })
       .from(order)
       .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
+      .innerJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
+      .innerJoin(branches, eq(cities.branch_id, branches.branch_id))
       .where(eq(order.order_id, payload.order_id))
-      .get()
+      .get(),
   );
 
   if (error) {
@@ -105,9 +115,10 @@ export async function processLoop() {
     const job = await fetchNextJob();
 
     if (job) {
+      const orderData = await handleOrder(job);
+
       try {
         emptyLoops = 0;
-        const orderData = await handleOrder(job);
 
         if (!orderData) {
           console.error("❌ Job returned no orderData");
@@ -144,7 +155,7 @@ export async function processLoop() {
             orderData.order_city,
             location.lat,
             location.lng,
-            driverClients
+            driverClients,
           );
 
           if (drivers.length === 0) {
@@ -161,12 +172,12 @@ export async function processLoop() {
                   ...orderData,
                   restaurant: rest,
                 },
-              })
+              }),
             );
           }
 
           console.log(
-            `📢 Worker broadcasted order ${orderData.order_id} to ${drivers.length} drivers.`
+            `📢 Worker broadcasted order ${orderData.order_id} to ${drivers.length} drivers.`,
           );
         } catch (err) {
           console.error("❌ Worker background search failed:", err);
@@ -184,6 +195,27 @@ export async function processLoop() {
           .update(orderQueues)
           .set({ status: "failed" })
           .where(eq(orderQueues.queue_id, job.queue_id));
+      }
+
+      if (restaurantClients.has(orderData?.restaurant.restaurant_id!)) {
+        restaurantClients.get(orderData?.restaurant.restaurant_id!)?.send(
+          JSON.stringify({
+            type: "order_assaging_failed",
+            order_id: orderData?.order_id,
+          }),
+        );
+      }
+
+      if (orderData?.branche_id && adminClients.has(orderData?.branche_id)) {
+        const clients = adminClients.get(orderData?.branche_id);
+        clients?.forEach((client) => {
+          client.send(
+            JSON.stringify({
+              type: "order_assaging_failed",
+              order_id: orderData?.order_id,
+            }),
+          );
+        });
       }
     } else {
       emptyLoops++;
