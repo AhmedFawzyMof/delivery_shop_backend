@@ -72,6 +72,24 @@ const getAllDrivers = async (req: Request, res: Response) => {
   });
 };
 
+const getAdminDriverById = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+
+  const { data: driver, error } = await tryCatch(DriverModel.getByIdAdmin(id));
+
+  if (error) {
+    console.error(error);
+    res.status(500).send(error.message);
+  }
+
+  if (!driver) {
+    console.error("no driver found by this id");
+    res.status(500).send("no driver found by this id");
+  }
+
+  res.json({ driver });
+};
+
 const getDriverById = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   const { history } = req.query;
@@ -540,4 +558,5 @@ export {
   updateOrderPickedUp,
   updateOrderDelivered,
   addFromAdmin,
+  getAdminDriverById,
 };

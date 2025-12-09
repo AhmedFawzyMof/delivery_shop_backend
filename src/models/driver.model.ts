@@ -116,6 +116,48 @@ export class DriverModel {
       );
   }
 
+  static async getByIdAdmin(id: number) {
+    return db
+      .select({
+        driver_id: driver.driver_id,
+        driver_full_name: driver.driver_full_name,
+        driver_phone: driver.driver_phone,
+        driver_city: driver.driver_city,
+        driver_status: driver.driver_status,
+        driver_created_at: driver.created_at,
+        driver_type: driver.driver_type,
+        is_baned: driver.is_baned,
+        stationed_at: restaurant.restaurant_id,
+        restaurant_name: restaurant.restaurant_name,
+        id_number: driver.id_number,
+        device_id: driver.device_id,
+        plate_number: driver.plate_number,
+        first_license_photo: driver.first_license_photo,
+        second_license_photo: driver.second_license_photo,
+        third_license_photo: driver.third_license_photo,
+        fourth_license_photo: driver.fourth_license_photo,
+        freelancer: driver.freelancer,
+        shift_duration: driver.shift_duration,
+        rate: driver.rate,
+        login_record: {
+          driver_image: driver_login_record.driver_image,
+          login_time: driver_login_record.login_time,
+          shift_start_time: driver_login_record.shift_start_time,
+          shift_end_time: driver_login_record.shift_end_time,
+        },
+      })
+      .from(driver)
+      .leftJoin(
+        driver_login_record,
+        eq(driver.driver_id, driver_login_record.driver_id)
+      )
+      .innerJoin(cities, eq(driver.driver_city, cities.city_name))
+      .leftJoin(restaurant, eq(driver.stationed_at, restaurant.restaurant_id))
+      .where(eq(driver.driver_id, id))
+      .groupBy(driver.driver_id)
+      .get();
+  }
+
   static async getById(id: number) {
     const result = await db
       .select()

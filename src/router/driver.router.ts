@@ -11,6 +11,7 @@ import {
   updateOrderPickedUp,
   updateOrderDelivered,
   addFromAdmin,
+  getAdminDriverById,
 } from "../controllers/driver.controller";
 import { authMiddleware } from "../middleware/auth";
 const storage = multer.diskStorage({
@@ -51,6 +52,7 @@ const router = express.Router();
 
 router.get("/", authMiddleware, getAllDrivers);
 router.get("/:id", authMiddleware, getDriverById);
+router.get("/admin/:id", authMiddleware, getAdminDriverById);
 router.post(
   "/register",
   upload.fields([
