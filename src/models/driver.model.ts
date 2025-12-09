@@ -50,8 +50,10 @@ export class DriverModel {
         count: sql<number>`COUNT(${driver.driver_id})`,
       })
       .from(driver)
-      .leftJoin(cities, eq(driver.driver_city, cities.city_name))
+      .innerJoin(cities, eq(driver.driver_city, cities.city_name))
+      .leftJoin(restaurant, eq(driver.stationed_at, restaurant.restaurant_id))
       .where(and(...conditions))
+      .groupBy(driver.driver_id)
       .get();
 
     const result = await db
