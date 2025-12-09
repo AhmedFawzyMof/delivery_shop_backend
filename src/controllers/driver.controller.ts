@@ -127,7 +127,6 @@ const addDriver = async (req: Request, res: Response) => {
     "driver_phone",
     "driver_city",
     "id_number",
-    "device_id",
     "plate_number",
     "stationed_at",
     "password",
@@ -206,7 +205,6 @@ const addFromAdmin = async (req: Request, res: Response) => {
     "driver_phone",
     "driver_city",
     "id_number",
-    "device_id",
     "plate_number",
     "password",
     "is_baned",
@@ -367,15 +365,26 @@ const editDriver = async (req: Request, res: Response) => {
 
   const allUpdates = { ...textUpdates, ...fileUpdates };
 
-  const newData = { ...allUpdates };
+  const processedData = { ...allUpdates };
   if (allUpdates.is_baned) {
-    Object.assign(newData, { is_baned: JSON.parse(allUpdates.is_baned) });
+    Object.assign(processedData, { is_baned: JSON.parse(allUpdates.is_baned) });
   }
   if (allUpdates.freelancer) {
-    Object.assign(newData, { freelancer: JSON.parse(allUpdates.freelancer) });
+    Object.assign(processedData, {
+      freelancer: JSON.parse(allUpdates.freelancer),
+    });
   }
-
-  const { error } = await tryCatch(DriverModel.update(id, newData));
+  if (
+    allUpdates.device_id === "" ||
+    !allUpdates.device_id ||
+    allUpdates.device_id.includes("undefined")
+  ) {
+    Object.assign(processedData, { device_id: null });
+  }
+  if (allUpdates.stationed_at === "" || !allUpdates.stationed_at) {
+    Object.assign(processedData, { stationed_at: null });
+  }
+  const { error } = await tryCatch(DriverModel.update(id, processedData));
 
   if (error) {
     console.log(error);
