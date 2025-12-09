@@ -69,6 +69,7 @@ export class DriverModel {
         stationed_at: restaurant.restaurant_id,
         restaurant_name: restaurant.restaurant_name,
         id_number: driver.id_number,
+        device_id: driver.device_id,
         plate_number: driver.plate_number,
         first_license_photo: driver.first_license_photo,
         second_license_photo: driver.second_license_photo,
