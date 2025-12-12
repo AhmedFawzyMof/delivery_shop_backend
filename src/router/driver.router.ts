@@ -60,6 +60,9 @@ router.post(
     { name: "second_license_photo", maxCount: 1 },
     { name: "third_license_photo", maxCount: 1 },
     { name: "fourth_license_photo", maxCount: 1 },
+    { name: "fifth_license_photo", maxCount: 1 },
+    { name: "sixth_license_photo", maxCount: 1 },
+    { name: "seventh_license_photo", maxCount: 1 },
   ]),
   addDriver
 );
@@ -71,6 +74,9 @@ router.post(
     { name: "second_license_photo", maxCount: 1 },
     { name: "third_license_photo", maxCount: 1 },
     { name: "fourth_license_photo", maxCount: 1 },
+    { name: "fifth_license_photo", maxCount: 1 },
+    { name: "sixth_license_photo", maxCount: 1 },
+    { name: "seventh_license_photo", maxCount: 1 },
   ]),
   addFromAdmin
 );
@@ -84,6 +90,9 @@ router.put(
     { name: "second_license_photo", maxCount: 1 },
     { name: "third_license_photo", maxCount: 1 },
     { name: "fourth_license_photo", maxCount: 1 },
+    { name: "fifth_license_photo", maxCount: 1 },
+    { name: "sixth_license_photo", maxCount: 1 },
+    { name: "seventh_license_photo", maxCount: 1 },
   ]),
   editDriver
 );
