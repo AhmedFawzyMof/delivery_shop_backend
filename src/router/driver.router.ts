@@ -4,6 +4,7 @@ import path from "path";
 import multer from "multer";
 import {
   getAllDrivers,
+  getActiveDriver,
   getDriverById,
   addDriver,
   editDriver,
@@ -51,6 +52,7 @@ const upload = multer({ storage });
 const router = express.Router();
 
 router.get("/", authMiddleware, getAllDrivers);
+router.get("/active", authMiddleware, getActiveDriver);
 router.get("/:id", authMiddleware, getDriverById);
 router.get("/admin/:id", authMiddleware, getAdminDriverById);
 router.post(

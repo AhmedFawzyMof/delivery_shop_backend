@@ -186,9 +186,10 @@ export const adminUpdateOrder = async (req: Request, res: Response) => {
   const currentDate = new Date().toISOString();
 
   let orderError;
+  let orderData;
 
   if (order_status === "delivered") {
-    const { data: _, error } = await tryCatch(
+    const { data, error } = await tryCatch(
       OrderModel.update(id, {
         order_status: order_status,
         delivered_at: currentDate,
@@ -196,10 +197,11 @@ export const adminUpdateOrder = async (req: Request, res: Response) => {
     );
 
     orderError = error;
+    orderData = data;
   }
 
   if (order_status === "picked-up") {
-    const { data: _, error } = await tryCatch(
+    const { data, error } = await tryCatch(
       OrderModel.update(id, {
         order_status: order_status,
         picked_up_at: currentDate,
@@ -207,10 +209,11 @@ export const adminUpdateOrder = async (req: Request, res: Response) => {
     );
 
     orderError = error;
+    orderData = data;
   }
 
   if (order_status === "ready") {
-    const { data: _, error } = await tryCatch(
+    const { data, error } = await tryCatch(
       OrderModel.update(id, {
         order_status: order_status,
         ready_at: currentDate,
@@ -218,9 +221,10 @@ export const adminUpdateOrder = async (req: Request, res: Response) => {
     );
 
     orderError = error;
+    orderData = data;
   }
 
-  const { data: _, error } = await tryCatch(
+  const { data, error } = await tryCatch(
     OrderModel.update(id, {
       order_status: order_status,
     })
@@ -234,6 +238,38 @@ export const adminUpdateOrder = async (req: Request, res: Response) => {
   if (orderError?.message) {
     console.error(orderError.message);
     res.status(500).json({ message: orderError.message });
+  }
+
+  orderData = data;
+
+  if (orderData?.restaurant_id) {
+    broadcastToRestaurant(orderData.restaurant_id, {
+      type: "order_status_updated",
+      order: orderData,
+    });
+  }
+
+  if (orderData?.driver_id) {
+    for (const ws of driverClients.values()) {
+      if (
+        ws.driver_stationed_at === orderData.restaurant_id &&
+        ws.driver_orders &&
+        ws.driver_orders.includes(orderData.order_id) &&
+        ws.readyState === ws.OPEN
+      ) {
+        ws.send(
+          JSON.stringify({
+            type: "order_status_updated",
+            order_id: orderData.order_id,
+            order_status: orderData.order_status,
+          })
+        );
+        console.log(
+          `📢 Sent order status update for order ${orderData.order_id} to driver ${ws.driver_id}`
+        );
+        break;
+      }
+    }
   }
 
   res.json({ success: true });

@@ -72,6 +72,29 @@ const getAllDrivers = async (req: Request, res: Response) => {
   });
 };
 
+const getActiveDriver = async (req: Request, res: Response) => {
+  const adminUser = (req as any).user.data;
+  const citiesData = await CitiesModel.getCityByBranchId(
+    adminUser.branches.branch_id
+  );
+
+  const cities = citiesData.map((city) => city.city_name);
+
+  const drivers = Array.from(driverClients.values())
+    .filter((ws) => {
+      return ws.driver_status === "READY" && cities.includes(ws.driver_city!);
+    })
+    .map((ws) => ({
+      driver_id: ws.driver_id,
+      driver_name: ws.driver_name,
+      driver_city: ws.driver_city,
+      driver_type: ws.driver_type,
+      driver_status: ws.driver_status,
+    }));
+
+  return res.json({ drivers: drivers });
+};
+
 const getAdminDriverById = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
 
@@ -551,6 +574,7 @@ const updateOrderDelivered = async (req: Request, res: Response) => {
 
 export {
   getAllDrivers,
+  getActiveDriver,
   getDriverById,
   addDriver,
   editDriver,
