@@ -397,8 +397,8 @@ export const updateOrder = async (req: Request, res: Response) => {
 
 export const assignOrder = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
-    const { data, error } = await tryCatch(OrderModel.getById(id));
+    const { driver_id, orders } = req.body;
+    const { data, error } = await tryCatch(OrderModel.getByIds(orders));
 
     if (error || !data) {
       return res
@@ -406,28 +406,33 @@ export const assignOrder = async (req: Request, res: Response) => {
         .json({ message: error?.message || "Order not found" });
     }
 
-    const restaurant = {
-      name: data.restaurant_name,
-      id: data.restaurant_id,
-      location: data.location,
-      address: data.restaurant_address,
-    };
+    const ordersToSend: any = [];
 
-    const order = { ...data };
+    orders.forEach((order: any) => {
+      const restaurant = {
+        name: order.restaurant_name,
+        id: order.restaurant_id,
+        location: order.location,
+        address: order.restaurant_address,
+      };
 
-    const wsClient = driverClients.get(Number(req.body.driver_id));
+      ordersToSend.push({ ...order, restaurant });
+    });
+
+    const wsClient = driverClients.get(Number(driver_id));
 
     if (wsClient && wsClient.readyState === wsClient.OPEN) {
-      wsClient.send(
-        JSON.stringify({
-          type: "new_order_nearby",
-          order: { ...order, restaurant },
-        })
-      );
+      ordersToSend.forEach((order: any) => {
+        wsClient.send(
+          JSON.stringify({
+            type: "new_order_nearby",
+            order: order,
+          })
+        );
+      });
       return res.json({ success: true });
     }
 
-    // If driver not connected
     return res.json({ success: false, message: "Driver not connected" });
   } catch (err) {
     console.error(err);

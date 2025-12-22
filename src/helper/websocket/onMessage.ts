@@ -33,8 +33,6 @@ export async function onMessageHandler(
   const messageData = JSON.parse(message.toString());
   const senderType = getSenderType(messageData);
 
-  console.log(messageData, senderType);
-
   if (senderType === "admin") {
     if (messageData.type === "admin_init") {
       ws.branch_id = messageData.branch_id;

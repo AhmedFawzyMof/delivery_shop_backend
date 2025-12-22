@@ -43,7 +43,7 @@ router.get("/", authMiddleware, getAllOrders);
 router.get("/admin", authMiddleware, getAllOrdersAdmin);
 router.get("/order/:id", authMiddleware, getOrderById);
 router.post("/", authMiddleware, upload.single("receiptImage"), createOrder);
-router.post("/assign/:id", authMiddleware, assignOrder);
+router.post("/assign", authMiddleware, assignOrder);
 router.put("/admin/:id", authMiddleware, adminUpdateOrder);
 router.put("/:id", authMiddleware, updateOrder);
 router.delete("/:id", authMiddleware, deleteOrder);

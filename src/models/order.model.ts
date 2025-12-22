@@ -278,6 +278,29 @@ export class OrderModel {
     return result;
   }
 
+  static async getByIds(ids: number[]) {
+    const result = await db
+      .select({
+        order_id: order.order_id,
+        restaurant_id: order.restaurant_id,
+        restaurant_name: restaurant.restaurant_name,
+        restaurant_address: restaurant.address,
+        location: restaurant.location,
+        order_total_price: order.order_total_price,
+        order_status: order.order_status,
+        order_receipt: order.order_receipt,
+        order_delivery_cost: order.order_delivery_cost,
+        order_notes: order.order_notes,
+        driver_id: order.driver_id,
+        created_at: order.created_at,
+      })
+      .from(order)
+      .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
+      .where(inArray(order.order_id, ids));
+
+    return result ?? null;
+  }
+
   static async getById(id: number) {
     const result = await db
       .select({
