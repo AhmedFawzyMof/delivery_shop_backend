@@ -251,12 +251,7 @@ export const adminUpdateOrder = async (req: Request, res: Response) => {
 
   if (orderData?.driver_id) {
     for (const ws of driverClients.values()) {
-      if (
-        ws.driver_stationed_at === orderData.restaurant_id &&
-        ws.driver_orders &&
-        ws.driver_orders.includes(orderData.order_id) &&
-        ws.readyState === ws.OPEN
-      ) {
+      if (ws.driver_id === orderData.driver_id) {
         ws.send(
           JSON.stringify({
             type: "order_status_updated",
