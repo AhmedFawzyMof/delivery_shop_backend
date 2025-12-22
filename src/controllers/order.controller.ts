@@ -408,7 +408,7 @@ export const assignOrder = async (req: Request, res: Response) => {
 
     const ordersToSend: any = [];
 
-    orders.forEach((order: any) => {
+    data.forEach((order: any) => {
       const restaurant = {
         name: order.restaurant_name,
         id: order.restaurant_id,
