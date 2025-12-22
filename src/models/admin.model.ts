@@ -22,8 +22,6 @@ export class AdminModel {
       : `${from_date} 00:00:00`;
     const toDateTime = to_date.includes(":") ? to_date : `${to_date} 23:59:59`;
 
-    const cityNames = cities.map((c: any) => c.city_name);
-
     return db
       .select({
         order_count: sql<number>`COUNT(${order.order_id})`,
@@ -33,13 +31,13 @@ export class AdminModel {
           SELECT COUNT(DISTINCT ${driver.driver_id}) 
           FROM ${driver} 
           WHERE ${driver.driver_status} = 'approved'
-          AND ${inArray(driver.driver_city, cityNames)}
+          AND ${inArray(driver.driver_city, cities)}
         )`,
         total_restaurants: sql<number>`(
           SELECT COUNT(DISTINCT ${restaurant.restaurant_id}) 
           FROM ${restaurant} 
           WHERE ${restaurant.is_baned} = 0
-          AND ${inArray(restaurant.restaurant_city, cityNames)}
+          AND ${inArray(restaurant.restaurant_city, cities)}
         )`,
       })
       .from(order)
@@ -51,7 +49,7 @@ export class AdminModel {
         and(
           sql`datetime(${order.created_at}) >= datetime(${fromDateTime})`,
           sql`datetime(${order.created_at}) <= datetime(${toDateTime})`,
-          inArray(restaurant.restaurant_city, cityNames)
+          inArray(order.order_city, cities)
         )
       )
       .get();

@@ -180,6 +180,65 @@ export const createOrder = async (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
+export const adminUpdateOrder = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const { order_status } = req.body;
+  const currentDate = new Date().toISOString();
+
+  let orderError;
+
+  if (order_status === "delivered") {
+    const { data: _, error } = await tryCatch(
+      OrderModel.update(id, {
+        order_status: order_status,
+        delivered_at: currentDate,
+      })
+    );
+
+    orderError = error;
+  }
+
+  if (order_status === "picked-up") {
+    const { data: _, error } = await tryCatch(
+      OrderModel.update(id, {
+        order_status: order_status,
+        picked_up_at: currentDate,
+      })
+    );
+
+    orderError = error;
+  }
+
+  if (order_status === "ready") {
+    const { data: _, error } = await tryCatch(
+      OrderModel.update(id, {
+        order_status: order_status,
+        ready_at: currentDate,
+      })
+    );
+
+    orderError = error;
+  }
+
+  const { data: _, error } = await tryCatch(
+    OrderModel.update(id, {
+      order_status: order_status,
+    })
+  );
+
+  if (error) {
+    console.error(error.message);
+    res.status(500).json({ message: error.message });
+  }
+
+  if (orderError?.message) {
+    console.error(orderError.message);
+    res.status(500).json({ message: orderError.message });
+  }
+
+  res.json({ success: true });
+};
+
 export const updateOrder = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const updateStatus = req.query.update_status === "true";

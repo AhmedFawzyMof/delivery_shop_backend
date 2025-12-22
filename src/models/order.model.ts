@@ -1,6 +1,6 @@
 import { db } from "../config/db/index.js";
 import { cities, driver, order, restaurant } from "../config/db/schema.js";
-import { eq, sql, and, desc, not } from "drizzle-orm";
+import { eq, sql, and, desc, not, inArray } from "drizzle-orm";
 
 export class OrderModel {
   static async create(data: Partial<typeof order.$inferInsert>) {
@@ -13,7 +13,7 @@ export class OrderModel {
       .returning();
   }
 
-  static async getLatest() {
+  static async getLatest(cities: string[]) {
     return db
       .select({
         order_id: order.order_id,
@@ -22,6 +22,7 @@ export class OrderModel {
         order_delivery_cost: order.order_delivery_cost,
       })
       .from(order)
+      .where(inArray(order.order_city, cities))
       .orderBy(desc(order.created_at))
       .limit(5);
   }
@@ -65,7 +66,6 @@ export class OrderModel {
 
     const result = await db
       .selectDistinct({
-        order_id: order.order_id,
         restaurant_id: order.restaurant_id,
         restaurant_name: restaurant.restaurant_name,
         restaurant_address: restaurant.address,
@@ -73,6 +73,8 @@ export class OrderModel {
         order_total_price: order.order_total_price,
         order_status: order.order_status,
         order_receipt: order.order_receipt,
+        order_city: order.order_city,
+        order_id: order.order_id,
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
         user_phone: order.user_phone,

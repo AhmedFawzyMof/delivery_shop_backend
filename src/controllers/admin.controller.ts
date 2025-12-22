@@ -29,7 +29,7 @@ const adminDashboard = async (req: Request, res: Response) => {
   const citiesName: any = cities.map((c) => c.city_name);
 
   const { data: stats, error: statsError } = await tryCatch(
-    AdminModel.getStats(startISO, endISO, cities)
+    AdminModel.getStats(startISO, endISO, citiesName)
   );
 
   if (statsError) {
@@ -38,7 +38,7 @@ const adminDashboard = async (req: Request, res: Response) => {
   }
 
   const { data: orders, error: ordersError } = await tryCatch(
-    OrderModel.getLatest()
+    OrderModel.getLatest(citiesName)
   );
 
   if (ordersError) {

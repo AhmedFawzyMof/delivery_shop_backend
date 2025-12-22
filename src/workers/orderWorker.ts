@@ -8,14 +8,81 @@ import {
 } from "../config/db/schema";
 import { eq, and, isNull, not, sql, asc } from "drizzle-orm";
 import tryCatch from "../utils/trycatch";
-import searchForDrivers from "../utils/geoFunctions";
-import { adminClients, driverClients, restaurantClients } from "..";
-import { type } from "os";
+import { Worker } from "worker_threads";
+import path from "path";
+import {
+  adminClients,
+  driverClients,
+  ExtWebSocket,
+  restaurantClients,
+} from "..";
 
 type RestaurantLocation = {
   lat: number;
   lng: number;
 };
+
+function buildDriverSnapshot(drivers: Map<number, ExtWebSocket>) {
+  return Array.from(drivers.values()).map((ws) => ({
+    driver_id: ws.driver_id!,
+    driver_city: ws.driver_city!,
+    driver_status: ws.driver_status!,
+    driver_stationed_at: ws.driver_stationed_at,
+    location: ws.driver_location,
+  }));
+}
+
+function searchForDriversAsync({
+  restaurant_id,
+  order_city,
+  lat,
+  lon,
+  options = {
+    maxDurationMs: 180000,
+    startRadiusKm: 2,
+    radiusStepKm: 1,
+    intervalMs: 5000,
+  },
+}: {
+  restaurant_id: number;
+  order_city: string;
+  lat: number;
+  lon: number;
+  driverClients: Map<number, ExtWebSocket>;
+  options?: {
+    maxDurationMs?: number;
+    startRadiusKm?: number;
+    radiusStepKm?: number;
+    intervalMs?: number;
+  };
+}): Promise<number[]> {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(
+      path.join(__dirname, "../workers/searchDrivers.worker.js")
+    );
+
+    const driversSnapshot = buildDriverSnapshot(driverClients);
+
+    worker.once("message", (msg) => {
+      if (msg.type === "RESULT") resolve(msg.drivers);
+      worker.terminate();
+    });
+
+    worker.once("error", (err) => {
+      reject(err);
+      worker.terminate();
+    });
+
+    worker.postMessage({
+      restaurant_id,
+      order_city,
+      lat,
+      lon,
+      drivers: driversSnapshot,
+      options,
+    });
+  });
+}
 
 async function fetchNextJob() {
   const LOCK_TIMEOUT = 30000;
@@ -30,15 +97,15 @@ async function fetchNextJob() {
       and(
         eq(orderQueues.status, "processing"),
         not(isNull(orderQueues.locked_at)),
-        sql`${orderQueues.locked_at} < ${Date.now() - LOCK_TIMEOUT}`,
-      ),
+        sql`${orderQueues.locked_at} < ${Date.now() - LOCK_TIMEOUT}`
+      )
     );
 
   const job = await db
     .select()
     .from(orderQueues)
     .where(
-      and(eq(orderQueues.status, "pending"), isNull(orderQueues.locked_at)),
+      and(eq(orderQueues.status, "pending"), isNull(orderQueues.locked_at))
     )
     .orderBy(asc(orderQueues.created_at))
     .limit(1);
@@ -90,7 +157,7 @@ async function handleOrder(job: any) {
       .innerJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
       .innerJoin(branches, eq(cities.branch_id, branches.branch_id))
       .where(eq(order.order_id, payload.order_id))
-      .get(),
+      .get()
   );
 
   if (error) {
@@ -150,13 +217,17 @@ export async function processLoop() {
             throw new Error("Order city missing");
           }
 
-          const drivers = await searchForDrivers(
-            rest.restaurant_id,
-            orderData.order_city,
-            location.lat,
-            location.lng,
+          const driverIds = await searchForDriversAsync({
+            restaurant_id: rest.restaurant_id,
+            order_city: orderData.order_city,
+            lat: location.lat,
+            lon: location.lng,
             driverClients,
-          );
+          });
+
+          const drivers = driverIds
+            .map((id) => driverClients.get(id)!)
+            .filter(Boolean);
 
           if (drivers.length === 0) {
             console.error("❌ No drivers available.");
@@ -172,12 +243,12 @@ export async function processLoop() {
                   ...orderData,
                   restaurant: rest,
                 },
-              }),
+              })
             );
           }
 
           console.log(
-            `📢 Worker broadcasted order ${orderData.order_id} to ${drivers.length} drivers.`,
+            `📢 Worker broadcasted order ${orderData.order_id} to ${drivers.length} drivers.`
           );
         } catch (err) {
           console.error("❌ Worker background search failed:", err);
@@ -202,7 +273,7 @@ export async function processLoop() {
           JSON.stringify({
             type: "order_assaging_failed",
             order_id: orderData?.order_id,
-          }),
+          })
         );
       }
 
@@ -213,7 +284,7 @@ export async function processLoop() {
             JSON.stringify({
               type: "order_assaging_failed",
               order_id: orderData?.order_id,
-            }),
+            })
           );
         });
       }
