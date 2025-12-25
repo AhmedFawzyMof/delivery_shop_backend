@@ -58,7 +58,7 @@ function searchForDriversAsync({
 }): Promise<number[]> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(
-      path.join(__dirname, "../workers/searchDrivers.worker.js")
+      path.join(__dirname, "..","workers","searchForDriversWorker.worker.ts")
     );
 
     const driversSnapshot = buildDriverSnapshot(driverClients);

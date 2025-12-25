@@ -11,7 +11,7 @@ export class OrderQueuesModel {
     return await db
       .select()
       .from(orderQueues)
-      .where(eq(orderQueues.queueId, queueId));
+      .where(eq(orderQueues.queue_id, queueId));
   }
 
   static async getFirstPending() {
@@ -33,14 +33,14 @@ export class OrderQueuesModel {
     return await db
       .update(orderQueues)
       .set(data)
-      .where(eq(orderQueues.queueId, queueId))
+      .where(eq(orderQueues.queue_id, queueId))
       .returning();
   }
 
   static async delete(queueId: number) {
     return await db
       .delete(orderQueues)
-      .where(eq(orderQueues.queueId, queueId))
+      .where(eq(orderQueues.queue_id, queueId))
       .returning();
   }
 }
