@@ -5,19 +5,56 @@ import {
   createRestaurant,
   updateRestaurant,
   deleteRestaurant,
-} from "../controllers/restaurant.controller.js";
-import { authMiddleware } from "../middleware/auth.js";
+} from "../controllers/restaurant.controller";
+import {
+  authMiddleware,
+  permissionMiddleware,
+  roleMiddleware,
+} from "../middleware/authentication.middleware";
 import multer from "multer";
+import { Permissions } from "../constants/permission";
 
 const upload = multer({ dest: "temp/" });
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAllRestaurants);
-router.get("/:id", authMiddleware, getRestaurantById);
+router.get(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.RESTAURANT_VIEW]),
+  getAllRestaurants,
+);
+router.get(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.RESTAURANT_VIEW]),
+  getRestaurantById,
+);
 router.post("/register", upload.single("logo"), createRestaurant);
-router.post("/", authMiddleware, upload.single("logo"), createRestaurant);
-router.put("/:id", authMiddleware, updateRestaurant);
-router.delete("/:id", authMiddleware, deleteRestaurant);
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.RESTAURANT_CREATE]),
+  upload.single("logo"),
+  createRestaurant,
+);
+router.put(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.RESTAURANT_EDIT]),
+  updateRestaurant,
+);
+
+// router.delete(
+//   "/:id",
+//   authMiddleware,
+//   roleMiddleware(["admin"]),
+//   permissionMiddleware([Permissions.RESTAURANT_DELETE]),
+//   deleteRestaurant
+// );
 
 export default router;

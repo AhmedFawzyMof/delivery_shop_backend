@@ -1,11 +1,11 @@
-import { db } from "../config/db/index.js";
+import { db } from "../config/db/index";
 import {
   cities,
   driver,
   driver_login_record,
   order,
   restaurant,
-} from "../config/db/schema.js";
+} from "../config/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 
 export class DriverModel {
@@ -24,7 +24,7 @@ export class DriverModel {
     status: any,
     city: any,
     search: any,
-    branch_id: number
+    branch_id: number,
   ) {
     const limit = page * 25;
     const offset = (page - 1) * 25;
@@ -88,7 +88,7 @@ export class DriverModel {
       .from(driver)
       .leftJoin(
         driver_login_record,
-        eq(driver.driver_id, driver_login_record.driver_id)
+        eq(driver.driver_id, driver_login_record.driver_id),
       )
       .innerJoin(cities, eq(driver.driver_city, cities.city_name))
       .leftJoin(restaurant, eq(driver.stationed_at, restaurant.restaurant_id))
@@ -111,8 +111,8 @@ export class DriverModel {
       .where(
         and(
           and(eq(driver.is_baned, false), eq(driver.driver_status, "approved")),
-          and(eq(driver.driver_phone, phone), eq(driver.password, password))
-        )
+          and(eq(driver.driver_phone, phone), eq(driver.password, password)),
+        ),
       );
   }
 
@@ -149,7 +149,7 @@ export class DriverModel {
       .from(driver)
       .leftJoin(
         driver_login_record,
-        eq(driver.driver_id, driver_login_record.driver_id)
+        eq(driver.driver_id, driver_login_record.driver_id),
       )
       .innerJoin(cities, eq(driver.driver_city, cities.city_name))
       .leftJoin(restaurant, eq(driver.stationed_at, restaurant.restaurant_id))
@@ -173,11 +173,11 @@ export class DriverModel {
     const result = await db
       .selectDistinct({
         todayEarnings: sql<number>`SUM(${order.order_delivery_cost})`.as(
-          "todayEarnings"
+          "todayEarnings",
         ),
         completedToday:
           sql<number>`COUNT(CASE WHEN ${order.order_status} = 'delivered' THEN 1 END)`.as(
-            "completedToday"
+            "completedToday",
           ),
       })
       .from(driver)
@@ -187,9 +187,9 @@ export class DriverModel {
           eq(driver.driver_id, id),
           and(
             sql`datetime(${order.created_at}) >= datetime(${fromDateTime})`,
-            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`
-          )
-        )
+            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`,
+          ),
+        ),
       );
     return result[0] ?? null;
   }

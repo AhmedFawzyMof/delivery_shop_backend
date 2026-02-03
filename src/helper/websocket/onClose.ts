@@ -3,7 +3,7 @@ import {
   driverClients,
   ExtWebSocket,
   restaurantClients,
-} from "../..";
+} from "../../utils/websocketManager";
 
 export function onCloseHandler(ws: ExtWebSocket) {
   if (ws.driver_id && driverClients.has(ws.driver_id)) {

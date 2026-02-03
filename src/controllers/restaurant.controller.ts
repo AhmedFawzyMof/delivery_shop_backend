@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { RestaurantModel } from "../models/restaurant.model.js";
-import tryCatch from "../utils/trycatch.js";
-import { convertToWebp } from "../utils/imageconverter.js";
+import { RestaurantModel } from "../models/restaurant.model";
+import tryCatch from "../utils/trycatch";
+import { convertToWebp } from "../utils/imageconverter";
 import path from "path";
 import fs from "fs";
-import { extractLocationFromGoogleMapsLink } from "../utils/location.js";
-import { CitiesModel } from "../models/cities.model.js";
+import { extractLocationFromGoogleMapsLink } from "../utils/location";
+import { CitiesModel } from "../models/cities.model";
 import crypto from "crypto";
 
 export const getAllRestaurants = async (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ export const getAllRestaurants = async (req: Request, res: Response) => {
   const city = req.query.city as string;
 
   const { data, error } = await tryCatch(
-    RestaurantModel.getAll(search, city, page, adminUser.branches.branch_id)
+    RestaurantModel.getAll(search, city, page, adminUser.branches.branch_id),
   );
 
   if (error) {
@@ -23,7 +23,7 @@ export const getAllRestaurants = async (req: Request, res: Response) => {
   }
 
   const cities = await CitiesModel.getCityByBranchId(
-    adminUser.branches.branch_id
+    adminUser.branches.branch_id,
   );
 
   res.json({ restaurants: data, cities });
@@ -32,7 +32,7 @@ export const getAllRestaurants = async (req: Request, res: Response) => {
 export const getRestaurantById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const { data: restaurant, error } = await tryCatch(
-    RestaurantModel.getById(id)
+    RestaurantModel.getById(id),
   );
 
   if (error) {
@@ -63,7 +63,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
         "public",
         "images",
         "restaurant",
-        restaurantName
+        restaurantName,
       );
 
       if (!fs.existsSync(uploadDir)) {
@@ -105,7 +105,7 @@ export const createRestaurant = async (req: Request, res: Response) => {
       commercial_register,
       location: parsedLocation,
       password: hashedPassword,
-    })
+    }),
   );
 
   if (error) {
@@ -123,7 +123,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
   if (ban) {
     const value = JSON.parse(ban as string) || false;
     const { data: _, error } = await tryCatch(
-      RestaurantModel.update(id, { is_baned: value })
+      RestaurantModel.update(id, { is_baned: value }),
     );
     if (error) {
       return res.status(500).json({ message: error.message });
@@ -145,7 +145,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
   }
 
   const { data: _, error } = await tryCatch(
-    RestaurantModel.update(id, req.body)
+    RestaurantModel.update(id, req.body),
   );
 
   if (error) {

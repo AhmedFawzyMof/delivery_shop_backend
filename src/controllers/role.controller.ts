@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
+import tryCatch from "../utils/trycatch";
+import { RolesModel } from "../models/roles.model";
 
 const getAllRoles = async (req: Request, res: Response) => {
-  try {
-    res.json({ message: "Get all roles" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch roles" });
+  const { data, error } = await tryCatch(RolesModel.getAll());
+
+  if (error) {
+    return res.status(500).json({ message: error.message });
   }
+
+  res.json(data);
 };
 
 const getRoleById = async (req: Request, res: Response) => {

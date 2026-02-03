@@ -1,5 +1,5 @@
-import { db } from "../config/db/index.js";
-import { cities, driver, order, restaurant } from "../config/db/schema.js";
+import { db } from "../config/db/index";
+import { cities, driver, order, restaurant } from "../config/db/schema";
 import { eq, sql, and, desc, not, inArray } from "drizzle-orm";
 
 export class OrderModel {
@@ -32,7 +32,7 @@ export class OrderModel {
     city: string | undefined,
     search: string | undefined,
     branch_id: number,
-    page: number
+    page: number,
   ) {
     const ITEMS_PER_PAGE = 50;
     const offset = (page - 1) * ITEMS_PER_PAGE;
@@ -77,6 +77,7 @@ export class OrderModel {
         order_id: order.order_id,
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
+        payment_method: order.payment_method,
         user_phone: order.user_phone,
         driver_id: order.driver_id,
         driver_full_name: driver.driver_full_name,
@@ -87,6 +88,7 @@ export class OrderModel {
         ready_at: order.ready_at,
         picked_up_at: order.picked_up_at,
         delivered_at: order.delivered_at,
+        cancelation_reason: order.cancelation_reason,
       })
       .from(order)
       .leftJoin(driver, eq(order.driver_id, driver.driver_id))
@@ -95,7 +97,10 @@ export class OrderModel {
       .where(and(...conditions))
       .limit(limit)
       .offset(offset)
-      .orderBy(desc(order.created_at));
+      .orderBy(
+        sql`CASE WHEN ${order.order_status} = 'canceled' THEN 1 ELSE 0 END`,
+        desc(order.created_at),
+      );
 
     return {
       orderCount: orderCount?.order_count,
@@ -107,7 +112,7 @@ export class OrderModel {
     from_date: string,
     to_date: string,
     restaurant_id: number,
-    page: number
+    page: number,
   ) {
     const fromDateTime = from_date.includes(":")
       ? from_date
@@ -126,6 +131,7 @@ export class OrderModel {
         order_receipt: order.order_receipt,
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
+        payment_method: order.payment_method,
         driver_id: order.driver_id,
         created_at: order.created_at,
       })
@@ -135,9 +141,9 @@ export class OrderModel {
           eq(order.restaurant_id, restaurant_id),
           and(
             sql`datetime(${order.created_at}) >= datetime(${fromDateTime})`,
-            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`
-          )
-        )
+            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`,
+          ),
+        ),
       )
       .limit(limit)
       .offset(offset)
@@ -149,7 +155,9 @@ export class OrderModel {
     to_date: string,
     city: string | undefined,
     branch_id: number,
-    page: number
+    page: number,
+    driver_id: number | undefined,
+    restaurant_id: number | undefined,
   ) {
     const fromDateTime = from_date.includes(":")
       ? from_date
@@ -169,6 +177,14 @@ export class OrderModel {
       conditions.push(eq(restaurant.restaurant_city, city));
     }
 
+    if (driver_id) {
+      conditions.push(eq(order.driver_id, driver_id));
+    }
+
+    if (restaurant_id) {
+      conditions.push(eq(order.restaurant_id, restaurant_id));
+    }
+
     return await db
       .select({
         order_id: order.order_id,
@@ -178,6 +194,10 @@ export class OrderModel {
         order_receipt: order.order_receipt,
         order_delivery_cost: order.order_delivery_cost,
         order_notes: order.order_notes,
+        payment_method: order.payment_method,
+        ready_at: order.ready_at,
+        picked_up_at: order.picked_up_at,
+        delivered_at: order.delivered_at,
         user_phone: order.user_phone,
         driver_id: order.driver_id,
         created_at: order.created_at,
@@ -196,7 +216,7 @@ export class OrderModel {
   static async getStats(
     from_date: string,
     to_date: string,
-    restaurant_id: number
+    restaurant_id: number,
   ) {
     const fromDateTime = from_date.includes(":")
       ? from_date
@@ -206,13 +226,13 @@ export class OrderModel {
     const result = await db
       .select({
         sum_of_orders: sql<number>`COUNT(${order.order_id})`.as(
-          "sum_of_orders"
+          "sum_of_orders",
         ),
         total_price: sql<number>`SUM(${order.order_total_price})`.as(
-          "total_price"
+          "total_price",
         ),
         delivery_cost: sql<number>`SUM(${order.order_delivery_cost})`.as(
-          "delivery_cost"
+          "delivery_cost",
         ),
         sum_of_completed_orders: sql<number>`
           COUNT(CASE WHEN ${order.order_status} = 'delivered' THEN 1 END)
@@ -224,9 +244,9 @@ export class OrderModel {
           eq(order.restaurant_id, restaurant_id),
           and(
             sql`datetime(${order.created_at}) >= datetime(${fromDateTime})`,
-            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`
-          )
-        )
+            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`,
+          ),
+        ),
       )
       .get();
 
@@ -237,7 +257,9 @@ export class OrderModel {
     from_date: string,
     to_date: string,
     city: string | undefined,
-    branch_id: number
+    branch_id: number,
+    driver_id: number | undefined,
+    restaurant_id: number | undefined,
   ) {
     const fromDateTime = from_date.includes(":")
       ? from_date
@@ -254,20 +276,37 @@ export class OrderModel {
       conditions.push(eq(restaurant.restaurant_city, city));
     }
 
+    if (driver_id) {
+      conditions.push(eq(order.driver_id, driver_id));
+    }
+
+    if (restaurant_id) {
+      conditions.push(eq(order.restaurant_id, restaurant_id));
+    }
+
     const result = await db
       .select({
         sum_of_orders: sql<number>`COUNT(${order.order_id})`.as(
-          "sum_of_orders"
+          "sum_of_orders",
         ),
         total_price: sql<number>`SUM(${order.order_total_price})`.as(
-          "total_price"
+          "total_price",
         ),
-        delivery_cost: sql<number>`SUM(${order.order_delivery_cost})`.as(
-          "delivery_cost"
-        ),
+        delivery_cost:
+          sql<number>`SUM(CASE WHEN ${order.order_status} = 'delivered' THEN ${order.order_delivery_cost} ELSE 0 END)`.as(
+            "delivery_cost",
+          ),
         sum_of_completed_orders: sql<number>`
         COUNT(CASE WHEN ${order.order_status} = 'delivered' THEN 1 END)
       `.as("sum_of_completed_orders"),
+        cancelled_orders:
+          sql<number>`COUNT(CASE WHEN ${order.order_status} = 'canceled' THEN 1 END)`.as(
+            "cancelled_orders",
+          ),
+        cancelled_cost:
+          sql<number>`SUM(CASE WHEN ${order.order_status} = 'canceled' THEN ${order.order_delivery_cost} END)`.as(
+            "cancelled_cost",
+          ),
       })
       .from(order)
       .innerJoin(restaurant, eq(order.restaurant_id, restaurant.restaurant_id))
@@ -361,7 +400,7 @@ export class OrderModel {
       .selectDistinct({ order_id: order.order_id })
       .from(order)
       .where(
-        and(not(eq(order.order_status, "delivered")), eq(order.driver_id, id))
+        and(not(eq(order.order_status, "delivered")), eq(order.driver_id, id)),
       )
       .as("sub");
 
@@ -372,6 +411,7 @@ export class OrderModel {
         order_total_price: order.order_total_price,
         order_delivery_cost: order.order_delivery_cost,
         order_city: order.order_city,
+        payment_method: order.order_city,
         user_phone: order.user_phone,
         created_at: order.created_at,
         ready_at: order.ready_at,
@@ -393,7 +433,7 @@ export class OrderModel {
     id: number,
     from_date: string,
     to_date: string,
-    page: number
+    page: number,
   ) {
     const fromDateTime = from_date.includes(":")
       ? from_date
@@ -414,9 +454,9 @@ export class OrderModel {
           eq(order.driver_id, id),
           and(
             sql`datetime(${order.created_at}) >= datetime(${fromDateTime})`,
-            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`
-          )
-        )
+            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`,
+          ),
+        ),
       )
       .get();
 
@@ -437,9 +477,9 @@ export class OrderModel {
           eq(order.driver_id, id),
           and(
             sql`datetime(${order.created_at}) >= datetime(${fromDateTime})`,
-            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`
-          )
-        )
+            sql`datetime(${order.created_at}) <= datetime(${toDateTime})`,
+          ),
+        ),
       )
       .limit(limit)
       .offset(offset)

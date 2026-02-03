@@ -3,7 +3,7 @@ import {
   driverClients,
   ExtWebSocket,
   restaurantClients,
-} from "../..";
+} from "../../utils/websocketManager";
 
 export function onErrorHandler(ws: ExtWebSocket) {
   driverClients.forEach((wsConnection, driver_id, map) => {

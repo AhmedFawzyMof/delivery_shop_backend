@@ -24,7 +24,7 @@ const restaurant_login = async (req: Request, res: Response) => {
     .digest("hex");
 
   const { data, error } = await tryCatch(
-    RestaurantModel.getByNameAndPassword(restaurant_name, hashedPassword),
+    RestaurantModel.getByNameAndPassword(restaurant_name, hashedPassword)
   );
 
   if (error) return res.status(500).json({ message: error.message });
@@ -67,7 +67,7 @@ const driver_login = async (req: Request, res: Response) => {
   const hashedPassword = hashPassword(password);
 
   const { data: driver, error } = await tryCatch(
-    DriverModel.getByPhoneAndPassword(phone, hashedPassword),
+    DriverModel.getByPhoneAndPassword(phone, hashedPassword)
   );
 
   if (error) return res.status(500).send(error.message);
@@ -84,7 +84,7 @@ const driver_login = async (req: Request, res: Response) => {
     }
   } else {
     const { error: updateError } = await tryCatch(
-      DriverModel.update(driverRecord.driver_id, { device_id: device_id }),
+      DriverModel.update(driverRecord.driver_id, { device_id: device_id })
     );
     if (updateError) {
       return res.status(500).json({ message: updateError.message });
@@ -108,7 +108,7 @@ const driver_login = async (req: Request, res: Response) => {
   const { error: recordError } = await handleLoginRecord(
     driverRecord.driver_id,
     selfiePath,
-    shiftDuration,
+    shiftDuration
   );
 
   if (recordError) {
@@ -119,7 +119,7 @@ const driver_login = async (req: Request, res: Response) => {
 
   const sessionToken = createSessionToken(
     { ...driverRecord, type: "driver", shiftDuration },
-    `${shiftDuration}h` as TokenDuration,
+    `${shiftDuration}h` as TokenDuration
   );
 
   res.json({
@@ -141,10 +141,14 @@ const admin_login = async (req: Request, res: Response) => {
     .digest("hex");
 
   const { data, error } = await tryCatch(
-    AdminModel.login(identifier, hashedPassword),
+    AdminModel.login(identifier, hashedPassword)
   );
 
-  if (error) return res.status(500).json({ message: error.message });
+  if (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: error.message });
+  }
+
   if (!data) return res.status(401).json({ message: "Invalid credentials" });
 
   const sessionToken = createSessionToken({ ...data, type: "admin" }, "1d");

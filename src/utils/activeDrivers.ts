@@ -1,4 +1,4 @@
-import { driverClients, ExtWebSocket } from "../";
+import { driverClients, ExtWebSocket } from "../utils/websocketManager";
 
 /**
  * Count active drivers in given cities

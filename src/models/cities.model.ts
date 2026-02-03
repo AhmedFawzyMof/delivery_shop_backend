@@ -23,6 +23,7 @@ export class CitiesModel {
       .select({
         city_id: cities.city_id,
         city_name: cities.city_name,
+        branch_id: cities.branch_id,
       })
       .from(cities)
       .where(and(...conditions));

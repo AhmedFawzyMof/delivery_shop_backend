@@ -25,7 +25,7 @@ export const driver = sqliteTable("driver", {
   driver_status: text("driver_status").default("pending"),
   is_baned: integer("is_banned", { mode: "boolean" }).default(false),
   stationed_at: integer("stationed_at").references(
-    () => restaurant.restaurant_id
+    () => restaurant.restaurant_id,
   ),
   id_number: text("id_number"),
   device_id: text("device_id"),
@@ -66,15 +66,17 @@ export const order = sqliteTable("order", {
   order_city: text("order_city"),
   pickup_image: text("pickup_image"),
   order_notes: text("order_notes"),
+  payment_method: text("payment_method"),
   user_phone: text("user_phone"),
   driver_id: integer("driver_id").references(() => driver.driver_id),
   restaurant_id: integer("restaurant_id").references(
-    () => restaurant.restaurant_id
+    () => restaurant.restaurant_id,
   ),
   created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   ready_at: text("ready_at"),
   picked_up_at: text("picked_up_at"),
   delivered_at: text("delivered_at"),
+  cancelation_reason: text("cancellation_reason"),
 });
 
 export const cities = sqliteTable("cities", {
@@ -86,7 +88,7 @@ export const cities = sqliteTable("cities", {
 export const roles = sqliteTable("roles", {
   role_id: integer("role_id").primaryKey({ autoIncrement: true }),
   role_name: text("role_name"),
-  description: text("description"),
+  permissions: text("permissions", { mode: "json" }),
 });
 
 export const admin = sqliteTable("admin", {

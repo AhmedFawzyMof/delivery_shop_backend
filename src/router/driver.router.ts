@@ -14,7 +14,13 @@ import {
   addFromAdmin,
   getAdminDriverById,
 } from "../controllers/driver.controller";
-import { authMiddleware } from "../middleware/auth";
+import {
+  authMiddleware,
+  permissionMiddleware,
+  roleMiddleware,
+} from "../middleware/authentication.middleware";
+import { Permissions } from "../constants/permission";
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const driverId = Date.now().toString();
@@ -51,10 +57,33 @@ const upload = multer({ storage });
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAllDrivers);
-router.get("/active", authMiddleware, getActiveDriver);
-router.get("/:id", authMiddleware, getDriverById);
-router.get("/admin/:id", authMiddleware, getAdminDriverById);
+router.get(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.DRIVER_VIEW]),
+  getAllDrivers
+);
+router.get(
+  "/active",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.DRIVER_VIEW]),
+  getActiveDriver
+);
+router.get(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin", "driver"]),
+  getDriverById
+);
+router.get(
+  "/admin/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.DRIVER_VIEW]),
+  getAdminDriverById
+);
 router.post(
   "/register",
   upload.fields([
@@ -71,6 +100,8 @@ router.post(
 router.post(
   "/",
   authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.DRIVER_CREATE]),
   upload.fields([
     { name: "first_license_photo", maxCount: 1 },
     { name: "second_license_photo", maxCount: 1 },
@@ -82,11 +113,23 @@ router.post(
   ]),
   addFromAdmin
 );
-router.put("/update_order/:id", authMiddleware, updateOrderPickedUp);
-router.put("/order_delivered/:id", authMiddleware, updateOrderDelivered);
+router.put(
+  "/update_order/:id",
+  authMiddleware,
+  roleMiddleware(["driver"]),
+  updateOrderPickedUp
+);
+router.put(
+  "/order_delivered/:id",
+  authMiddleware,
+  roleMiddleware(["driver"]),
+  updateOrderDelivered
+);
 router.put(
   "/:id",
   authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.DRIVER_EDIT]),
   upload.fields([
     { name: "first_license_photo", maxCount: 1 },
     { name: "second_license_photo", maxCount: 1 },
@@ -98,6 +141,6 @@ router.put(
   ]),
   editDriver
 );
-router.delete("/:id", deleteDriver);
+// router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), deleteDriver);
 
 export default router;

@@ -1,18 +1,39 @@
 import { Router } from "express";
-import { ContactController } from "../controllers/contact.controller";
-
+import {
+  getAllContacts,
+  getContactById,
+  createContact,
+  deleteContact,
+} from "../controllers/contact.controller";
+import {
+  authMiddleware,
+  permissionMiddleware,
+  roleMiddleware,
+} from "../middleware/authentication.middleware";
+import { Permissions } from "../constants/permission";
 const router = Router();
 
-// Get all contacts
-router.get("/", ContactController.getAll);
-
-// Get a single contact
-router.get("/:id", ContactController.getById);
-
-// Create new contact
-router.post("/", ContactController.create);
-
-// Delete contact
-router.delete("/:id", ContactController.delete);
+router.get(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.CONTACT_VIEW]),
+  getAllContacts
+);
+router.post("/", createContact);
+router.get(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.CONTACT_VIEW]),
+  getContactById
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  permissionMiddleware([Permissions.CONTACT_DELETE]),
+  deleteContact
+);
 
 export default router;

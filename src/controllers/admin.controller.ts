@@ -10,7 +10,7 @@ const adminDashboard = async (req: Request, res: Response) => {
   const adminUser = (req as any).user.data;
 
   const cities = await CitiesModel.getCityByBranchId(
-    adminUser.branches.branch_id
+    adminUser.branches.branch_id,
   );
 
   const now = new Date();
@@ -21,7 +21,7 @@ const adminDashboard = async (req: Request, res: Response) => {
     0,
     23,
     59,
-    59
+    59,
   );
   const startISO = startOfMonth.toISOString();
   const endISO = endOfMonth.toISOString();
@@ -29,7 +29,7 @@ const adminDashboard = async (req: Request, res: Response) => {
   const citiesName: any = cities.map((c) => c.city_name);
 
   const { data: stats, error: statsError } = await tryCatch(
-    AdminModel.getStats(startISO, endISO, citiesName)
+    AdminModel.getStats(startISO, endISO, citiesName),
   );
 
   if (statsError) {
@@ -38,7 +38,7 @@ const adminDashboard = async (req: Request, res: Response) => {
   }
 
   const { data: orders, error: ordersError } = await tryCatch(
-    OrderModel.getLatest(citiesName)
+    OrderModel.getLatest(citiesName),
   );
 
   if (ordersError) {
@@ -59,9 +59,11 @@ const adminOrders = async (req: Request, res: Response) => {
   const adminUser = (req as any).user.data;
   const page = req.query.page ? Number(req.query.page) : 1;
   const city = req.query.city as string | undefined;
+  const driver = Number(req.query.driver) as number | undefined;
+  const restaurant = Number(req.query.restaurant) as number | undefined;
 
   const cities = await CitiesModel.getCityByBranchId(
-    adminUser.branches.branch_id
+    adminUser.branches.branch_id,
   );
 
   const from_date = req.query.from
@@ -84,8 +86,10 @@ const adminOrders = async (req: Request, res: Response) => {
       from_date!,
       to_date!,
       city,
-      adminUser.branches.branch_id
-    )
+      adminUser.branches.branch_id,
+      driver,
+      restaurant,
+    ),
   );
 
   if (error) {
@@ -98,8 +102,10 @@ const adminOrders = async (req: Request, res: Response) => {
       to_date!,
       city,
       adminUser.branches.branch_id,
-      page
-    )
+      page,
+      driver,
+      restaurant,
+    ),
   );
 
   if (ordersError) {
@@ -111,7 +117,12 @@ const adminOrders = async (req: Request, res: Response) => {
 };
 
 const getAllAdmins = async (req: Request, res: Response) => {
-  const { data, error } = await tryCatch(AdminModel.getAll());
+  const adminUser = (req as any).user.data;
+  const page = req.query.page ? Number(req.query.page) : 1;
+
+  const { data, error } = await tryCatch(
+    AdminModel.getAll(adminUser.branches.branch_id, page),
+  );
 
   if (error) {
     console.log(error);
@@ -120,18 +131,30 @@ const getAllAdmins = async (req: Request, res: Response) => {
 
   res.status(200).json(data);
 };
+
 const getAdminById = async (req: Request, res: Response) => {};
+
 const createAdmin = async (req: Request, res: Response) => {
+  const adminUser = (req as any).user.data;
+
   const password = req.body.password;
   const hashedPassword = crypto
     .createHash("sha256")
     .update(password)
     .digest("hex");
+
+  if (password && password === "") {
+    return res.json({ message: "password is required" });
+  }
+
   const { data, error } = await tryCatch(
-    AdminModel.create({
-      ...req.body,
-      password: hashedPassword,
-    })
+    AdminModel.create(
+      {
+        ...req.body,
+        password: hashedPassword,
+      },
+      adminUser.branches.branch_id,
+    ),
   );
 
   if (error) {
@@ -143,7 +166,20 @@ const createAdmin = async (req: Request, res: Response) => {
 };
 const updateAdmin = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { data, error } = await tryCatch(AdminModel.update(id, req.body));
+  const password = req.body.password;
+
+  const adminData = {
+    ...req.body,
+  };
+
+  if (password && password !== "") {
+    const hashedPassword = crypto
+      .createHash("sha256")
+      .update(password)
+      .digest("hex");
+    Object.assign(adminData, { password: hashedPassword });
+  }
+  const { data, error } = await tryCatch(AdminModel.update(id, adminData));
 
   if (error) {
     console.log(error);
@@ -152,7 +188,18 @@ const updateAdmin = async (req: Request, res: Response) => {
 
   res.status(200).json(data);
 };
-const deleteAdmin = async (req: Request, res: Response) => {};
+const deleteAdmin = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  const { data: _, error } = await tryCatch(AdminModel.delete(id));
+
+  if (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+
+  res.status(200).json({ message: "Admin deleted successfully" });
+};
 
 export {
   getAllAdmins,

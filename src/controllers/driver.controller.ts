@@ -1,12 +1,12 @@
-import { DriverModel } from "../models/driver.model.js";
+import { DriverModel } from "../models/driver.model";
 import { Request, Response } from "express";
 import fs from "fs";
-import { convertToWebp } from "../utils/imageconverter.js";
-import tryCatch from "../utils/trycatch.js";
+import { convertToWebp } from "../utils/imageconverter";
+import tryCatch from "../utils/trycatch";
 import path from "path";
-import { OrderModel } from "../models/order.model.js";
-import { broadcastToRestaurant, driverClients } from "../index.js";
-import { CitiesModel } from "../models/cities.model.js";
+import { OrderModel } from "../models/order.model";
+import { broadcastToRestaurant, driverClients } from "../utils/websocketManager";
+import { CitiesModel } from "../models/cities.model";
 import crypto from "crypto";
 import sharp from "sharp";
 

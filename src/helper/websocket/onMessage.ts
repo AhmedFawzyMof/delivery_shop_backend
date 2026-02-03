@@ -4,7 +4,7 @@ import {
   driverClients,
   ExtWebSocket,
   restaurantClients,
-} from "../..";
+} from "../../utils/websocketManager";
 import { OrderModel } from "../../models/order.model";
 import { BranchesModel } from "../../models/branches.model";
 
@@ -28,7 +28,7 @@ export function getSenderType(jsonData: any): SenderType {
 
 export async function onMessageHandler(
   ws: ExtWebSocket,
-  message: WebSocket.RawData
+  message: WebSocket.RawData,
 ) {
   const messageData = JSON.parse(message.toString());
   const senderType = getSenderType(messageData);
@@ -57,10 +57,10 @@ export async function onMessageHandler(
             type: "driver_location",
             driver_id: driver.driver_id,
             location: driver.driver_location,
-          })
+          }),
         );
         console.log(
-          `📍 Sent current location of driver ${messageData.driver_id} to admin`
+          `📍 Sent current location of driver ${messageData.driver_id} to admin`,
         );
       } else {
         ws.send(
@@ -69,7 +69,7 @@ export async function onMessageHandler(
             driver_id: messageData.driver_id,
             location: null,
             error: "Driver not connected or location unknown",
-          })
+          }),
         );
       }
     }
@@ -96,7 +96,7 @@ export async function onMessageHandler(
             type: "late_preparing_order",
             restaurant: data?.restaurant_name,
             order_id: messageData.order_id,
-          })
+          }),
         );
       });
     }
@@ -110,7 +110,7 @@ export async function onMessageHandler(
             type: "late_preparing_order",
             restaurant: data?.restaurant_name,
             order_id: messageData.order_id,
-          })
+          }),
         );
       });
     }
@@ -138,7 +138,7 @@ export async function onMessageHandler(
     if (messageData.type === "location_update") {
       console.log(
         `📍 Driver ${messageData.driver_id} location:`,
-        messageData.location
+        messageData.location,
       );
 
       const driver = driverClients.get(Number(messageData.driver_id));
@@ -168,7 +168,7 @@ export async function onMessageHandler(
           driver.driver_orders.push(messageData.order_id);
         }
         console.log(
-          `🆕 Driver ${messageData.driver_id} added order ${messageData.order_id}`
+          `🆕 Driver ${messageData.driver_id} added order ${messageData.order_id}`,
         );
       }
     }
@@ -178,11 +178,11 @@ export async function onMessageHandler(
 
       if (driver && driver.driver_orders) {
         driver.driver_orders = driver.driver_orders.filter(
-          (id) => id !== messageData.order_id
+          (id) => id !== messageData.order_id,
         );
 
         console.log(
-          `❌ Order ${messageData.order_id} removed from driver ${messageData.driver_id}`
+          `❌ Order ${messageData.order_id} removed from driver ${messageData.driver_id}`,
         );
       }
     }
@@ -192,7 +192,7 @@ export async function onMessageHandler(
       if (driver) {
         driver.driver_orders = [];
         console.log(
-          `🧹 Cleared all orders for driver ${messageData.driver_id}`
+          `🧹 Cleared all orders for driver ${messageData.driver_id}`,
         );
       }
     }
@@ -202,7 +202,7 @@ export async function onMessageHandler(
       if (driver) {
         driver.driver_city = messageData.driver_city;
         console.log(
-          `🌆 Driver ${messageData.driver_id} city updated to ${messageData.driver_city}`
+          `🌆 Driver ${messageData.driver_id} city updated to ${messageData.driver_city}`,
         );
       }
     }
@@ -214,10 +214,10 @@ export async function onMessageHandler(
           JSON.stringify({
             type: "driver_orders",
             orders: driver.driver_orders || [],
-          })
+          }),
         );
         console.log(
-          `📦 Sent current orders to driver ${messageData.driver_id}`
+          `📦 Sent current orders to driver ${messageData.driver_id}`,
         );
       }
     }

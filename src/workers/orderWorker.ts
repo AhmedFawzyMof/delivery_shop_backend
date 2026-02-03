@@ -15,7 +15,7 @@ import {
   driverClients,
   ExtWebSocket,
   restaurantClients,
-} from "..";
+} from "../utils/websocketManager";
 
 type RestaurantLocation = {
   lat: number;
@@ -58,7 +58,7 @@ function searchForDriversAsync({
 }): Promise<number[]> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(
-      path.join(__dirname, "..", "workers", "searchForDriversWorker.worker.js")
+      path.join(__dirname, "..", "workers", "searchForDriversWorker.worker.js"),
     );
 
     const driversSnapshot = buildDriverSnapshot(driverClients);
@@ -97,15 +97,15 @@ async function fetchNextJob() {
       and(
         eq(orderQueues.status, "processing"),
         not(isNull(orderQueues.locked_at)),
-        sql`${orderQueues.locked_at} < ${Date.now() - LOCK_TIMEOUT}`
-      )
+        sql`${orderQueues.locked_at} < ${Date.now() - LOCK_TIMEOUT}`,
+      ),
     );
 
   const job = await db
     .select()
     .from(orderQueues)
     .where(
-      and(eq(orderQueues.status, "pending"), isNull(orderQueues.locked_at))
+      and(eq(orderQueues.status, "pending"), isNull(orderQueues.locked_at)),
     )
     .orderBy(asc(orderQueues.created_at))
     .limit(1);
@@ -157,7 +157,7 @@ async function handleOrder(job: any) {
       .innerJoin(cities, eq(restaurant.restaurant_city, cities.city_name))
       .innerJoin(branches, eq(cities.branch_id, branches.branch_id))
       .where(eq(order.order_id, payload.order_id))
-      .get()
+      .get(),
   );
 
   if (error) {
@@ -243,12 +243,12 @@ export async function processLoop() {
                   ...orderData,
                   restaurant: rest,
                 },
-              })
+              }),
             );
           }
 
           console.log(
-            `📢 Worker broadcasted order ${orderData.order_id} to ${drivers.length} drivers.`
+            `📢 Worker broadcasted order ${orderData.order_id} to ${drivers.length} drivers.`,
           );
         } catch (err) {
           console.error("❌ Worker background search failed:", err);
@@ -273,7 +273,7 @@ export async function processLoop() {
           JSON.stringify({
             type: "order_assaging_failed",
             order_id: orderData?.order_id,
-          })
+          }),
         );
       }
 
@@ -284,7 +284,7 @@ export async function processLoop() {
             JSON.stringify({
               type: "order_assaging_failed",
               order_id: orderData?.order_id,
-            })
+            }),
           );
         });
       }

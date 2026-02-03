@@ -1,5 +1,5 @@
-import { db } from "../config/db/index.js";
-import { cities, restaurant } from "../config/db/schema.js";
+import { db } from "../config/db/index";
+import { cities, restaurant } from "../config/db/schema";
 import { eq, and, like, sql } from "drizzle-orm";
 
 export class RestaurantModel {

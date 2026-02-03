@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { OrderModel } from "../models/order.model.js";
-import tryCatch from "../utils/trycatch.js";
-import fs from "fs";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
-import { convertToWebp } from "../utils/imageconverter.js";
-import { broadcastToRestaurant, driverClients } from "../index.js";
-import searchForDrivers from "../utils/geoFunctions.js";
-import { CitiesModel } from "../models/cities.model.js";
-import { OrderQueuesModel } from "../models/order_queue.model.js";
+import { OrderModel } from "../models/order.model";
+import tryCatch from "../utils/trycatch";
+import { handleImageUpload } from "../utils/imageHandler";
+import {
+  broadcastToRestaurant,
+  driverClients,
+} from "../utils/websocketManager";
+import { CitiesModel } from "../models/cities.model";
+import { OrderQueuesModel } from "../models/order_queue.model";
+import { ORDER_STATUS } from "../constants/orderStatus";
 
 export const getAllOrders = async (req: Request, res: Response) => {
   const status = req.query.status;
@@ -33,7 +33,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
 
   if (status === "true") {
     const { data, error } = await tryCatch(
-      OrderModel.getStats(from_date!, to_date!, restaurant.id)
+      OrderModel.getStats(from_date!, to_date!, restaurant.id),
     );
 
     if (error) {
@@ -44,7 +44,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
   }
 
   const { data, error } = await tryCatch(
-    OrderModel.getAll(from_date!, to_date!, restaurant.id, page)
+    OrderModel.getAll(from_date!, to_date!, restaurant.id, page),
   );
 
   if (error) {
@@ -62,7 +62,7 @@ export const getAllOrdersAdmin = async (req: Request, res: Response) => {
   const adminUser = (req as any).user.data;
 
   const cities = await CitiesModel.getCityByBranchId(
-    adminUser.branches.branch_id
+    adminUser.branches.branch_id,
   );
 
   const { data, error } = await tryCatch(
@@ -71,8 +71,8 @@ export const getAllOrdersAdmin = async (req: Request, res: Response) => {
       city,
       search,
       adminUser.branches.branch_id,
-      page
-    )
+      page,
+    ),
   );
 
   if (error) {
@@ -100,30 +100,11 @@ export const createOrder = async (req: Request, res: Response) => {
 
   let imageUrl = "";
 
+  const finalDir = "public/images/receipt";
   if (req.body.receiptImage) {
-    const base64Data = req.body.receiptImage.split(";base64,").pop();
-    const imageBuffer = Buffer.from(base64Data, "base64");
-    const finalDir = "public/images/receipt";
-
-    if (!fs.existsSync(finalDir)) {
-      fs.mkdirSync(finalDir, { recursive: true });
-    }
-
-    const fileName = `${uuidv4()}.png`;
-    const filePath = path.join(finalDir, fileName);
-    fs.writeFileSync(filePath, imageBuffer);
-
-    const webpFileName = await convertToWebp(filePath, finalDir);
-    imageUrl = `/images/receipt/${webpFileName}`;
+    imageUrl = await handleImageUpload(req.body.receiptImage, finalDir);
   } else if (req.file) {
-    const finalDir = "public/images/receipt";
-
-    if (!fs.existsSync(finalDir)) {
-      fs.mkdirSync(finalDir, { recursive: true });
-    }
-
-    const webpFileName = await convertToWebp(req.file.path, finalDir);
-    imageUrl = `/images/receipt/${webpFileName}`;
+    imageUrl = await handleImageUpload(req.file, finalDir);
   }
 
   const { data: order_data, error: order_error } = await tryCatch(
@@ -131,12 +112,13 @@ export const createOrder = async (req: Request, res: Response) => {
       order_total_price: Number(req.body.totalAmount),
       order_delivery_cost: Number(req.body.deliveryCost),
       user_phone: req.body.customerPhone,
-      order_status: "preparing",
+      order_status: ORDER_STATUS.PREPARING,
       order_notes: req.body.notes,
       restaurant_id: restaurant.id,
       order_city: req.body.order_city,
       order_receipt: imageUrl,
-    })
+      payment_method: req.body.paymentMethod,
+    }),
   );
 
   if (order_error) {
@@ -158,11 +140,11 @@ export const createOrder = async (req: Request, res: Response) => {
         order_id: order.order_id,
         restaurant_id: restaurant.id,
       }),
-      status: "pending",
+      status: ORDER_STATUS.PREPARING,
       attempts: 0,
       created_at: Date.now(),
       updated_at: Date.now(),
-    })
+    }),
   );
 
   if (queue_error) {
@@ -180,67 +162,55 @@ export const createOrder = async (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
+const updateOrderStatus = async (
+  id: number,
+  order_status: string,
+  currentDate: string,
+  cancelation_reason?: string | undefined,
+) => {
+  let updateData: {
+    order_status: string;
+    delivered_at?: string;
+    picked_up_at?: string;
+    ready_at?: string;
+    cancelation_reason?: string;
+  } = { order_status: order_status };
+
+  switch (order_status) {
+    case ORDER_STATUS.DELIVERED:
+      updateData.delivered_at = currentDate;
+      break;
+    case ORDER_STATUS.PICKED_UP:
+      updateData.picked_up_at = currentDate;
+      break;
+    case ORDER_STATUS.READY:
+      updateData.ready_at = currentDate;
+      break;
+  }
+
+  if (order_status === ORDER_STATUS.CANCELED && cancelation_reason) {
+    updateData.cancelation_reason = cancelation_reason;
+  }
+
+  return await tryCatch(OrderModel.update(id, updateData));
+};
+
 export const adminUpdateOrder = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { order_status } = req.body;
+  const { order_status, cancellation_reason } = req.body;
   const currentDate = new Date().toISOString();
 
-  let orderError;
-  let orderData;
-
-  if (order_status === "delivered") {
-    const { data, error } = await tryCatch(
-      OrderModel.update(id, {
-        order_status: order_status,
-        delivered_at: currentDate,
-      })
-    );
-
-    orderError = error;
-    orderData = data;
-  }
-
-  if (order_status === "picked-up") {
-    const { data, error } = await tryCatch(
-      OrderModel.update(id, {
-        order_status: order_status,
-        picked_up_at: currentDate,
-      })
-    );
-
-    orderError = error;
-    orderData = data;
-  }
-
-  if (order_status === "ready") {
-    const { data, error } = await tryCatch(
-      OrderModel.update(id, {
-        order_status: order_status,
-        ready_at: currentDate,
-      })
-    );
-
-    orderError = error;
-    orderData = data;
-  }
-
-  const { data, error } = await tryCatch(
-    OrderModel.update(id, {
-      order_status: order_status,
-    })
+  const { data: orderData, error: orderError } = await updateOrderStatus(
+    id,
+    order_status,
+    currentDate,
+    cancellation_reason,
   );
 
-  if (error) {
-    console.error(error.message);
-    res.status(500).json({ message: error.message });
-  }
-
-  if (orderError?.message) {
+  if (orderError) {
     console.error(orderError.message);
-    res.status(500).json({ message: orderError.message });
+    return res.status(500).json({ message: orderError.message });
   }
-
-  orderData = data;
 
   if (orderData?.restaurant_id) {
     broadcastToRestaurant(orderData.restaurant_id, {
@@ -257,10 +227,10 @@ export const adminUpdateOrder = async (req: Request, res: Response) => {
             type: "order_status_updated",
             order_id: orderData.order_id,
             order_status: orderData.order_status,
-          })
+          }),
         );
         console.log(
-          `📢 Sent order status update for order ${orderData.order_id} to driver ${ws.driver_id}`
+          `📢 Sent order status update for order ${orderData.order_id} to driver ${ws.driver_id}`,
         );
         break;
       }
@@ -279,46 +249,14 @@ export const updateOrder = async (req: Request, res: Response) => {
   const currentDate = new Date().toISOString();
 
   if (updateStatus) {
-    let orderData;
-    let orderError;
-    if (req.body.order_status === "delivered") {
-      const { data, error } = await tryCatch(
-        OrderModel.update(id, {
-          order_status: req.body.order_status,
-          delivered_at: currentDate,
-        })
-      );
-
-      orderData = data;
-      orderError = error;
-    }
-
-    if (req.body.order_status === "picked-up") {
-      const { data, error } = await tryCatch(
-        OrderModel.update(id, {
-          order_status: req.body.order_status,
-          picked_up_at: currentDate,
-        })
-      );
-
-      orderData = data;
-      orderError = error;
-    }
-
-    if (req.body.order_status === "ready") {
-      const { data, error } = await tryCatch(
-        OrderModel.update(id, {
-          order_status: req.body.order_status,
-          ready_at: currentDate,
-        })
-      );
-
-      orderData = data;
-      orderError = error;
-    }
+    const { data: orderData, error: orderError } = await updateOrderStatus(
+      id,
+      newOrderStatus,
+      currentDate,
+    );
 
     if (orderError) {
-      res.status(500).json({ message: orderError.message });
+      return res.status(500).json({ message: orderError.message });
     }
 
     broadcastToRestaurant(req.body.restaurant_id, {
@@ -338,10 +276,10 @@ export const updateOrder = async (req: Request, res: Response) => {
             type: "order_status_updated",
             order_id: orderIdToUpdate,
             order_status: newOrderStatus,
-          })
+          }),
         );
         console.log(
-          `📢 Sent order status update for order ${orderIdToUpdate} to driver ${ws.driver_id}`
+          `📢 Sent order status update for order ${orderIdToUpdate} to driver ${ws.driver_id}`,
         );
         break;
       }
@@ -355,7 +293,7 @@ export const updateOrder = async (req: Request, res: Response) => {
       order_total_price: req.body.order_total_price,
       order_delivery_cost: req.body.order_delivery_cost,
       order_notes: req.body.notes,
-    })
+    }),
   );
 
   if (error) {
@@ -378,10 +316,10 @@ export const updateOrder = async (req: Request, res: Response) => {
         JSON.stringify({
           type: "updated_order",
           order: data,
-        })
+        }),
       );
       console.log(
-        `📢 Sent order status update for order ${orderIdToUpdate} to driver ${ws.driver_id}`
+        `📢 Sent order status update for order ${orderIdToUpdate} to driver ${ws.driver_id}`,
       );
       break;
     }
@@ -422,7 +360,7 @@ export const assignOrder = async (req: Request, res: Response) => {
           JSON.stringify({
             type: "new_order_nearby",
             order: order,
-          })
+          }),
         );
       });
       return res.json({ success: true });

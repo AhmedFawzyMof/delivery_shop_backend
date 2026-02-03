@@ -12,8 +12,39 @@ import {
 import { eq, and, or, sql, inArray } from "drizzle-orm";
 
 export class AdminModel {
-  static async getAll() {
-    return await db.select().from(admin);
+  static async getAll(branch_id: number, page: number) {
+    const ITEMS_PER_PAGE = 25;
+    const offset = (page - 1) * ITEMS_PER_PAGE;
+    const limit = ITEMS_PER_PAGE;
+
+    const admins = await db
+      .select({
+        admin_id: admin.admin_id,
+        admin_name: admin.admin_name,
+        admin_email: admin.admin_email,
+        admin_phone: admin.admin_phone,
+        role_name: roles.role_name,
+        role_id: roles.role_id,
+        is_active: admin.is_active,
+        created_at: admin.created_at,
+      })
+      .from(admin)
+      .innerJoin(roles, eq(admin.role_id, roles.role_id))
+      .innerJoin(admin_branches, eq(admin.admin_id, admin_branches.admin_id))
+      .where(eq(admin_branches.branch_id, branch_id))
+      .limit(limit)
+      .offset(offset)
+      .orderBy(sql`${admin.created_at} DESC`)
+      .all();
+
+    const total_admins = await db
+      .select({
+        total_admins: sql<number>`COUNT(${admin.admin_id})`,
+      })
+      .from(admin)
+      .get();
+
+    return { admins, total_admins: total_admins?.total_admins };
   }
 
   static async getStats(from_date: string, to_date: string, cities: any) {
@@ -67,7 +98,7 @@ export class AdminModel {
         role: {
           role_id: roles.role_id,
           role_name: roles.role_name,
-          description: roles.description,
+          permissions: roles.permissions,
         },
         branches: {
           branch_id: branches.branch_id,
@@ -86,8 +117,11 @@ export class AdminModel {
     return result;
   }
 
-  static async create(data: typeof admin.$inferInsert) {
-    return await db.insert(admin).values(data).returning();
+  static async create(data: typeof admin.$inferInsert, branch_id: number) {
+    const result = await db.insert(admin).values(data).returning();
+    await db
+      .insert(admin_branches)
+      .values({ admin_id: result[0].admin_id, branch_id });
   }
 
   static async update(id: number, data: Partial<typeof admin.$inferInsert>) {
@@ -114,7 +148,7 @@ export class AdminModel {
         role: {
           role_id: roles.role_id,
           role_name: roles.role_name,
-          description: roles.description,
+          permissions: roles.permissions,
         },
         branches: {
           branch_id: branches.branch_id,
